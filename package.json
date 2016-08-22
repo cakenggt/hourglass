@@ -1,0 +1,29 @@
+{
+  "name": "hourglass",
+  "version": "1.0.0",
+  "description": "Time tracking and invoicing web application",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha",
+    "start": "node index.js"
+  },
+  "keywords": [
+    "time",
+    "tracking",
+    "hourglass",
+    "invoice"
+  ],
+  "author": "Alec Lownes",
+  "license": "ISC",
+  "private": true,
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.0.2"
+  },
+  "dependencies": {
+    "express": "^4.14.0",
+    "pg": "^6.1.0",
+    "pug": "^2.0.0-beta5",
+    "sequelize": "^3.24.1"
+  }
+}
