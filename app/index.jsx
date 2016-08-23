@@ -20,7 +20,10 @@ var stubData = {
       jobId: 1
     }
   ]
-}
+};
+
+//TODO remove this line
+var globalId = 2;
 
 function formatDate(d) {
   var month = '' + (d.getMonth() + 1),
@@ -46,45 +49,84 @@ function stringToDate(str){
 }
 
 var TimeSheet = React.createClass({
+  getInitialState: function() {
+    return {
+      newEntry: false
+    };
+  },
   render: function() {
     var jobIds = [];
     for (var j = 0; j < this.props.data.jobs.length; j++){
       jobIds.push(this.props.data.jobs[j].id);
     }
+    var newTimeEntry = {
+      id: 'NEW',
+      time: 1,
+      date: new Date(),
+      summary: 'Summary Text',
+      jobId: 1
+    };
+    var newEntryField = this.state.newEntry ?
+      <TimeEntry
+        key="new"
+        data={newTimeEntry}
+        editable="true"
+        changeData={this.changeNewData}
+        jobIds={jobIds}
+        cancel={this.cancel}/> :
+      null;
     var entries = this.props.data.timeEntries.map(result => {
       return (
         <TimeEntry
           key={result.id}
           data={result}
+          editable="false"
           jobIds={jobIds}
-          changeData={this.props.changeData}/>
+          changeData={this.props.changeData}
+          cancel={this.cancel}/>
       );
     });
     return (
-      <table>
-        <thead>
-          <tr>
-            <th>Id</th>
-            <th>Time</th>
-            <th>Date</th>
-            <th>Summary</th>
-            <th>Job Id</th>
-            <th>Edit</th>
-            <th>Delete</th>
-          </tr>
-        </thead>
-        <tbody>
-          {entries}
-        </tbody>
-      </table>
+      <div>
+        <div onClick={this.addJob}>
+          Add Time Entry
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Time</th>
+              <th>Date</th>
+              <th>Summary</th>
+              <th>Job Id</th>
+              <th>Edit</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            {newEntryField}
+            {entries}
+          </tbody>
+        </table>
+      </div>
     );
+  },
+  addJob: function() {
+    this.setState({newEntry: true});
+  },
+  changeNewData: function(object){
+    this.setState({newEntry: false});
+    this.props.changeData(object);
+  },
+  cancel: function(){
+    this.setState({newEntry: false});
   }
 });
 
 var TimeEntry = React.createClass({
   getInitialState: function() {
     return {
-      editable: false,
+      editable: this.props.editable == 'true',
       data: this.props.data
     };
   },
@@ -165,6 +207,7 @@ var TimeEntry = React.createClass({
   },
   onCancel: function(){
     this.setState({editable: false});
+    this.props.cancel();
   },
   onEdit: function(){
     this.setState({editable: true});
@@ -181,11 +224,11 @@ var TimeEntry = React.createClass({
 var Jobs = React.createClass({
   getInitialState: function() {
     return {
-      data: this.props.data.jobs
+      newEntry: false
     };
   },
   render: function() {
-    var entries = this.state.data.map(result => {
+    var entries = this.props.data.jobs.map(result => {
       return (
         <JobEntry
           key={result.id}
@@ -401,6 +444,8 @@ var App = React.createClass({
     }
     else {
       //create record
+      //TODO remove this line
+      data.id = globalId++;
       entries.push(data);
       var state = {};
       state[key] = entries;
