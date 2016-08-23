@@ -7,19 +7,42 @@ var stubData = {
     {
       id: 1,
       title: 'govt job',
-      hourlyRate: 4,
-      taxRate: 3
+      hourlyRate: 4.06,
+      taxRate: 3.07
     }
   ],
   timeEntries: [
     {
       id: 1,
       time: 5,
-      date: '2016-08-23',
+      date: new Date(),
       summary: 'some summary text',
       jobId: 1
     }
   ]
+}
+
+function formatDate(d) {
+  var month = '' + (d.getMonth() + 1),
+    day = '' + d.getDate(),
+    year = d.getFullYear();
+
+  if (month.length < 2) month = '0' + month;
+  if (day.length < 2) day = '0' + day;
+
+  return [year, month, day].join('-');
+}
+
+function stringToDate(str){
+  var dateParts = str.split('-');
+  var date = new Date();
+  date.setFullYear(parseInt(dateParts[0]));
+  date.setMonth(parseInt(dateParts[1])-1);
+  date.setDate(parseInt(dateParts[2]));
+  date.setHours(0);
+  date.setMinutes(0);
+  date.setSeconds(0);
+  return date;
 }
 
 var TimeSheet = React.createClass({
@@ -66,6 +89,7 @@ var TimeEntry = React.createClass({
     };
   },
   render: function(){
+    var dateString = formatDate(this.state.data.date);
     if (this.state.editable){
       var id = this.state.data.id;
       var jobIds = this.props.jobIds.map(result => {
@@ -87,7 +111,7 @@ var TimeEntry = React.createClass({
               /></td>
           <td><input
                 type="date"
-                defaultValue={this.state.data.date}
+                defaultValue={dateString}
                 id={'date-'+id}
               /></td>
           <td><input
@@ -95,10 +119,10 @@ var TimeEntry = React.createClass({
                 defaultValue={this.state.data.summary}
                 id={'summary-'+id}
               /></td>
-            <td><select
-                  id={'jobId-'+id}
-                  defaultValue={this.state.data.jobId}
-                >{jobIds}</select></td>
+          <td><select
+                id={'jobId-'+id}
+                defaultValue={this.state.data.jobId}
+              >{jobIds}</select></td>
           <td>
             <span onClick={this.onSave}>Save</span>
           </td>
@@ -113,7 +137,7 @@ var TimeEntry = React.createClass({
         <tr>
           <td>{this.state.data.id}</td>
           <td>{this.state.data.time}</td>
-          <td>{this.state.data.date.toString()}</td>
+          <td>{dateString}</td>
           <td>{this.state.data.summary}</td>
           <td>{this.state.data.jobId}</td>
           <td>
@@ -129,7 +153,7 @@ var TimeEntry = React.createClass({
   onSave: function(){
     var data = this.state.data;
     data.time = parseInt($('#time-'+data.id).val());
-    data.date = $('#date-'+data.id).val();
+    data.date = stringToDate($('#date-'+data.id).val());
     data.summary = $('#summary-'+data.id).val();
     data.jobId = parseInt($('#jobId-'+data.id).val());
     this.setState({editable: false, data: data});
@@ -155,40 +179,153 @@ var TimeEntry = React.createClass({
 });
 
 var Jobs = React.createClass({
+  getInitialState: function() {
+    return {
+      data: this.props.data.jobs
+    };
+  },
   render: function() {
-    var entries = this.props.data.jobs.map(function(result){
+    var entries = this.state.data.map(result => {
       return (
-        <JobEntry key={result.id} data={result} changeData={this.props.changeData}/>
+        <JobEntry
+          key={result.id}
+          data={result}
+          editable="false"
+          changeData={this.props.changeData}
+          cancel={this.cancel}/>
       );
     });
+    var newJob = {
+      id: 'NEW',
+      title: 'New Job',
+      hourlyRate: 0,
+      taxRate: 0
+    };
+    var newEntryField = this.state.newEntry ?
+      <JobEntry
+        key="new"
+        data={newJob}
+        editable="true"
+        changeData={this.changeNewData}
+        cancel={this.cancel}/> :
+      null;
     return (
-      <table>
-        <thead>
-          <tr>
-            <th>Id</th>
-            <th>Title</th>
-            <th>Hourly Rate</th>
-            <th>Tax Rate</th>
-          </tr>
-        </thead>
-        <tbody>
-          {entries}
-        </tbody>
-      </table>
+      <div>
+        <div onClick={this.addJob}>
+          Add Job
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Title</th>
+              <th>Hourly Rate</th>
+              <th>Tax Rate</th>
+              <th>Edit</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            {newEntryField}
+            {entries}
+          </tbody>
+        </table>
+      </div>
     );
+  },
+  addJob: function() {
+    this.setState({newEntry: true});
+  },
+  changeNewData: function(object){
+    this.setState({newEntry: false});
+    this.props.changeData(object);
+  },
+  cancel: function(){
+    this.setState({newEntry: false});
   }
 });
 
 var JobEntry = React.createClass({
+  getInitialState: function() {
+    return {
+      editable: this.props.editable == 'true',
+      data: this.props.data
+    };
+  },
   render: function(){
-    return (
-      <tr>
-        <td>{this.props.data.id}</td>
-        <td>{this.props.data.title}</td>
-        <td>${this.props.data.hourlyRate}</td>
-        <td>${this.props.data.taxRate}</td>
-      </tr>
-    )
+    if (this.state.editable){
+      var id = this.state.data.id;
+      return (
+        <tr>
+          <td>{id}</td>
+          <td><input
+                type="text"
+                defaultValue={this.state.data.title}
+                id={'title-'+id}
+              /></td>
+          <td><input
+                type="number"
+                step="0.01"
+                defaultValue={this.state.data.hourlyRate}
+                id={'hourlyRate-'+id}
+              /></td>
+          <td><input
+                type="number"
+                step="0.01"
+                defaultValue={this.state.data.taxRate}
+                id={'taxRate-'+id}
+              /></td>
+          <td>
+            <span onClick={this.onSave}>Save</span>
+          </td>
+          <td>
+            <span onClick={this.onCancel}>Cancel</span>
+          </td>
+        </tr>
+      )
+    }
+    else{
+      return (
+        <tr>
+          <td>{this.props.data.id}</td>
+          <td>{this.props.data.title}</td>
+          <td>${this.props.data.hourlyRate}</td>
+          <td>${this.props.data.taxRate}</td>
+          <td>
+            <span onClick={this.onEdit}>Edit</span>
+          </td>
+          <td>
+            <span onClick={this.onDelete}>Delete</span>
+          </td>
+        </tr>
+      )
+    }
+  },
+  onSave: function(){
+    var data = this.state.data;
+    data.title = $('#title-'+data.id).val();
+    data.hourlyRate = parseFloat($('#hourlyRate-'+data.id).val());
+    data.taxRate = parseFloat($('#taxRate-'+data.id).val());
+    this.setState({editable: false, data: data});
+    this.props.changeData({
+      type: 'Job',
+      data: this.state.data,
+      delete: false
+    })
+  },
+  onCancel: function(){
+    this.setState({editable: false});
+    this.props.cancel();
+  },
+  onEdit: function(){
+    this.setState({editable: true});
+  },
+  onDelete: function(){
+    this.props.changeData({
+      type: 'Job',
+      data: this.state.data,
+      delete: true
+    });
   }
 });
 
@@ -237,25 +374,37 @@ var App = React.createClass({
     if (type == 'TimeEntry'){
       entries = this.state.timeEntries;
       key = 'timeEntries';
+      //TODO validate the time entry and return if bad
     }
     else if (type == 'Job'){
       entries = this.state.jobs;
       key = 'jobs';
+      //TODO validate the job and return if bad
     }
-    for (var i = 0; i < entries.length; i++){
-      var result = entries[i];
-      if (result.id === data.id){
-        if (del){
-          delete entries[i];
+    //TODO send ajax update or create or delete
+    if (data.id !== 'NEW'){
+      for (var i = 0; i < entries.length; i++){
+        var result = entries[i];
+        if (result.id === data.id){
+          if (del){
+            delete entries[i];
+          }
+          else{
+            entries[i] = data;
+          }
+          var state = {};
+          state[key] = entries;
+          this.setState(state);
+          return;
         }
-        else{
-          entries[i] = data;
-        }
-        var state = {};
-        state[key] = entries;
-        this.setState(state);
-        return;
       }
+    }
+    else {
+      //create record
+      entries.push(data);
+      var state = {};
+      state[key] = entries;
+      this.setState(state);
     }
   }
 });

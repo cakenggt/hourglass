@@ -8,7 +8,14 @@ module.exports = function(options){
   let models = options.models;
 
   app.post(prefix+'timeEntry', function(req, res){
-    //create and return created record
+    //create and return id
+    models.TimeEntry.create(req.body)
+    .then(function(result){
+      res.json({
+        id: result.dataValues.id
+      });
+      res.end();
+    });
   });
 
   app.get(prefix+'timeEntry:id', function(req, res){
@@ -24,7 +31,14 @@ module.exports = function(options){
   });
 
   app.post(prefix+'job', function(req, res){
-    //create and return created record
+    //create and return id
+    models.Job.create(req.body)
+    .then(function(result){
+      res.json({
+        id: result.dataValues.id
+      });
+      res.end();
+    });
   });
 
   app.get(prefix+'job:id', function(req, res){
