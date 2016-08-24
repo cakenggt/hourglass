@@ -169,9 +169,11 @@ var TimeEntry = React.createClass({
     this.setState({editable: true});
   },
   onDelete: function(){
+    var data = Object.assign({}, this.state.data);
+    data.date = DateUtils.formatDate(data.date);
     this.props.changeData({
       type: 'TimeEntry',
-      data: this.state.data,
+      data: data,
       delete: true
     });
   }
@@ -320,9 +322,11 @@ var JobEntry = React.createClass({
     this.setState({editable: true});
   },
   onDelete: function(){
+    var data = Object.assign({}, this.state.data);
+    data.date = DateUtils.formatDate(data.date);
     this.props.changeData({
       type: 'Job',
-      data: this.state.data,
+      data: data,
       delete: true
     });
   }

@@ -339,9 +339,11 @@
 	    this.setState({ editable: true });
 	  },
 	  onDelete: function onDelete() {
+	    var data = Object.assign({}, this.state.data);
+	    data.date = _Validator.DateUtils.formatDate(data.date);
 	    this.props.changeData({
 	      type: 'TimeEntry',
-	      data: this.state.data,
+	      data: data,
 	      delete: true
 	    });
 	  }
@@ -583,9 +585,11 @@
 	    this.setState({ editable: true });
 	  },
 	  onDelete: function onDelete() {
+	    var data = Object.assign({}, this.state.data);
+	    data.date = _Validator.DateUtils.formatDate(data.date);
 	    this.props.changeData({
 	      type: 'Job',
-	      data: this.state.data,
+	      data: data,
 	      delete: true
 	    });
 	  }

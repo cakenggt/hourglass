@@ -28,7 +28,7 @@ module.exports = function(options){
     });
   });
 
-  app.get(prefix+'timeEntry:id', function(req, res){
+  app.get(prefix+'timeEntry/:id', function(req, res){
     //read
     models.TimeEntry.findOne({
       where: {
@@ -78,7 +78,7 @@ module.exports = function(options){
     });
   });
 
-  app.delete(prefix+'timeEntry:id', function(req, res){
+  app.delete(prefix+'timeEntry/:id', function(req, res){
     //delete and return success value
     models.TimeEntry.findOne({
       where: {
@@ -116,7 +116,7 @@ module.exports = function(options){
     });
   });
 
-  app.get(prefix+'job:id', function(req, res){
+  app.get(prefix+'job/:id', function(req, res){
     //read
     models.Job.findOne({
       where: {
@@ -165,7 +165,7 @@ module.exports = function(options){
     });
   });
 
-  app.delete(prefix+'job:id', function(req, res){
+  app.delete(prefix+'job/:id', function(req, res){
     //delete and return success value
     models.Job.findOne({
       where: {
