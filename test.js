@@ -18,6 +18,7 @@ const db = new Sequelize(credentials.TEST_DATABASE_URL, {
   logging: console.log
 });
 const models = db.import(__dirname + '/models');
+const Validator = require('./app/Validator');
 
 var expect = require('chai').expect;
 
@@ -55,6 +56,32 @@ describe('object creation and deletion', function(){
       return job.createTimeEntry(testTimeEntry)
       .then(function(result){
         testTimeEntryId = result.dataValues.id;
+        expect(result.dataValues.date).to.be.an.instanceof(Date);
+      });
+    });
+  });
+  it('get all', function(){
+    return models.TimeEntry.findAll()
+    .then(function(timeEntries){
+      var totalJson = {jobs: [], timeEntries: []};
+      for (var t = 0; t < timeEntries.length; t++){
+        var timeEntry = timeEntries[t].get({
+          plain: true
+        });
+        timeEntry.date = Validator.DateUtils.formatDate(timeEntry.date);
+        totalJson.timeEntries.push(timeEntry);
+      }
+      return models.Job.findAll()
+      .then(function(jobs){
+        for (var j = 0; j < jobs.length; j++){
+          var job = jobs[j].get({
+            plain: true
+          });
+          totalJson.jobs.push(job);
+        }
+        expect(totalJson.timeEntries).to.have.length(1);
+        expect(totalJson.jobs).to.have.length(1);
+        console.log(totalJson);
       });
     });
   });

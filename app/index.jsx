@@ -1,52 +1,8 @@
 import React from 'react';
-import {Router, Route, IndexRoute, IndexLink, Link} from 'react-router';
+import {Router, Route, IndexRoute, IndexLink, Link, hashHistory} from 'react-router';
 import {render} from 'react-dom';
-
-var stubData = {
-  jobs: [
-    {
-      id: 1,
-      title: 'govt job',
-      hourlyRate: 4.06,
-      taxRate: 3.07
-    }
-  ],
-  timeEntries: [
-    {
-      id: 1,
-      time: 5,
-      date: new Date(),
-      summary: 'some summary text',
-      jobId: 1
-    }
-  ]
-};
-
-//TODO remove this line
-var globalId = 2;
-
-function formatDate(d) {
-  var month = '' + (d.getMonth() + 1),
-    day = '' + d.getDate(),
-    year = d.getFullYear();
-
-  if (month.length < 2) month = '0' + month;
-  if (day.length < 2) day = '0' + day;
-
-  return [year, month, day].join('-');
-}
-
-function stringToDate(str){
-  var dateParts = str.split('-');
-  var date = new Date();
-  date.setFullYear(parseInt(dateParts[0]));
-  date.setMonth(parseInt(dateParts[1])-1);
-  date.setDate(parseInt(dateParts[2]));
-  date.setHours(0);
-  date.setMinutes(0);
-  date.setSeconds(0);
-  return date;
-}
+import {DateUtils, JobValidator, TimeEntryValidator} from './Validator';
+import * as Network from './Network';
 
 var TimeSheet = React.createClass({
   getInitialState: function() {
@@ -131,7 +87,7 @@ var TimeEntry = React.createClass({
     };
   },
   render: function(){
-    var dateString = formatDate(this.state.data.date);
+    var dateString = DateUtils.formatDate(this.state.data.date);
     if (this.state.editable){
       var id = this.state.data.id;
       var jobIds = this.props.jobIds.map(result => {
@@ -195,7 +151,7 @@ var TimeEntry = React.createClass({
   onSave: function(){
     var data = this.state.data;
     data.time = parseInt($('#time-'+data.id).val());
-    data.date = stringToDate($('#date-'+data.id).val());
+    data.date = $('#date-'+data.id).val();
     data.summary = $('#summary-'+data.id).val();
     data.jobId = parseInt($('#jobId-'+data.id).val());
     this.setState({editable: false, data: data});
@@ -386,9 +342,16 @@ var Invoice = React.createClass({
 
 var App = React.createClass({
   getInitialState: function() {
-    return stubData;
+    return {
+      jobs: [],
+      timeEntries: []
+    };
+  },
+  componentDidMount: function() {
+    Network.getAll(this);
   },
   render: function() {
+    //TODO implement sorting
     return (
       <div>
         <h1>Hourglass</h1>
@@ -414,26 +377,47 @@ var App = React.createClass({
     var del = object.delete;
     var entries;
     var key;
+    var validatorOptions = {
+      needsId: data.id !== 'NEW'
+    };
     if (type == 'TimeEntry'){
       entries = this.state.timeEntries;
       key = 'timeEntries';
-      //TODO validate the time entry and return if bad
+      data.date = DateUtils.stringToDate(data.date);
+      //validate the time entry and return if bad
+      if (!TimeEntryValidator(data, validatorOptions)){
+        var state = {};
+        state[key] = entries;
+        //reset the state to get rid of the bad record
+        this.setState(state);
+        return;
+      }
     }
     else if (type == 'Job'){
       entries = this.state.jobs;
       key = 'jobs';
-      //TODO validate the job and return if bad
+      //validate the job and return if bad
+      if (!JobValidator(data, validatorOptions)){
+        var state = {};
+        state[key] = entries;
+        //reset the state to get rid of the bad record
+        this.setState(state);
+        return;
+      }
     }
-    //TODO send ajax update or create or delete
     if (data.id !== 'NEW'){
+      //The entry already exists, update it's state
       for (var i = 0; i < entries.length; i++){
+        //search for the entry that is correct
         var result = entries[i];
         if (result.id === data.id){
           if (del){
             delete entries[i];
+            Network.delete(this, data.id, type);
           }
           else{
             entries[i] = data;
+            Network.update(this, Object.assign({}, data), type);
           }
           var state = {};
           state[key] = entries;
@@ -443,19 +427,17 @@ var App = React.createClass({
       }
     }
     else {
-      //create record
-      //TODO remove this line
-      data.id = globalId++;
       entries.push(data);
       var state = {};
       state[key] = entries;
       this.setState(state);
+      Network.create(this, state, key, Object.assign({}, data), type);
     }
   }
 });
 
 render(
-  <Router>
+  <Router history={hashHistory}>
     <Route path="/" component={App}>
       <IndexRoute component={TimeSheet}/>
       <Route path="jobs" component={Jobs}/>

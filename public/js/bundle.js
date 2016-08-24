@@ -57,49 +57,15 @@
 	
 	var _reactDom = __webpack_require__(/*! react-dom */ 97);
 	
+	var _Validator = __webpack_require__(/*! ./Validator */ 235);
+	
+	var _Network = __webpack_require__(/*! ./Network */ 236);
+	
+	var Network = _interopRequireWildcard(_Network);
+	
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var stubData = {
-	  jobs: [{
-	    id: 1,
-	    title: 'govt job',
-	    hourlyRate: 4.06,
-	    taxRate: 3.07
-	  }],
-	  timeEntries: [{
-	    id: 1,
-	    time: 5,
-	    date: new Date(),
-	    summary: 'some summary text',
-	    jobId: 1
-	  }]
-	};
-	
-	//TODO remove this line
-	var globalId = 2;
-	
-	function formatDate(d) {
-	  var month = '' + (d.getMonth() + 1),
-	      day = '' + d.getDate(),
-	      year = d.getFullYear();
-	
-	  if (month.length < 2) month = '0' + month;
-	  if (day.length < 2) day = '0' + day;
-	
-	  return [year, month, day].join('-');
-	}
-	
-	function stringToDate(str) {
-	  var dateParts = str.split('-');
-	  var date = new Date();
-	  date.setFullYear(parseInt(dateParts[0]));
-	  date.setMonth(parseInt(dateParts[1]) - 1);
-	  date.setDate(parseInt(dateParts[2]));
-	  date.setHours(0);
-	  date.setMinutes(0);
-	  date.setSeconds(0);
-	  return date;
-	}
 	
 	var TimeSheet = _react2.default.createClass({
 	  displayName: 'TimeSheet',
@@ -224,7 +190,7 @@
 	    };
 	  },
 	  render: function render() {
-	    var dateString = formatDate(this.state.data.date);
+	    var dateString = _Validator.DateUtils.formatDate(this.state.data.date);
 	    if (this.state.editable) {
 	      var id = this.state.data.id;
 	      var jobIds = this.props.jobIds.map(function (result) {
@@ -355,7 +321,7 @@
 	  onSave: function onSave() {
 	    var data = this.state.data;
 	    data.time = parseInt($('#time-' + data.id).val());
-	    data.date = stringToDate($('#date-' + data.id).val());
+	    data.date = $('#date-' + data.id).val();
 	    data.summary = $('#summary-' + data.id).val();
 	    data.jobId = parseInt($('#jobId-' + data.id).val());
 	    this.setState({ editable: false, data: data });
@@ -656,11 +622,18 @@
 	  displayName: 'App',
 	
 	  getInitialState: function getInitialState() {
-	    return stubData;
+	    return {
+	      jobs: [],
+	      timeEntries: []
+	    };
+	  },
+	  componentDidMount: function componentDidMount() {
+	    Network.getAll(this);
 	  },
 	  render: function render() {
 	    var _this3 = this;
 	
+	    //TODO implement sorting
 	    return _react2.default.createElement(
 	      'div',
 	      null,
@@ -718,24 +691,45 @@
 	    var del = object.delete;
 	    var entries;
 	    var key;
+	    var validatorOptions = {
+	      needsId: data.id !== 'NEW'
+	    };
 	    if (type == 'TimeEntry') {
 	      entries = this.state.timeEntries;
 	      key = 'timeEntries';
-	      //TODO validate the time entry and return if bad
+	      data.date = _Validator.DateUtils.stringToDate(data.date);
+	      //validate the time entry and return if bad
+	      if (!(0, _Validator.TimeEntryValidator)(data, validatorOptions)) {
+	        var state = {};
+	        state[key] = entries;
+	        //reset the state to get rid of the bad record
+	        this.setState(state);
+	        return;
+	      }
 	    } else if (type == 'Job') {
 	      entries = this.state.jobs;
 	      key = 'jobs';
-	      //TODO validate the job and return if bad
+	      //validate the job and return if bad
+	      if (!(0, _Validator.JobValidator)(data, validatorOptions)) {
+	        var state = {};
+	        state[key] = entries;
+	        //reset the state to get rid of the bad record
+	        this.setState(state);
+	        return;
+	      }
 	    }
-	    //TODO send ajax update or create or delete
 	    if (data.id !== 'NEW') {
+	      //The entry already exists, update it's state
 	      for (var i = 0; i < entries.length; i++) {
+	        //search for the entry that is correct
 	        var result = entries[i];
 	        if (result.id === data.id) {
 	          if (del) {
 	            delete entries[i];
+	            Network.delete(this, data.id, type);
 	          } else {
 	            entries[i] = data;
+	            Network.update(this, Object.assign({}, data), type);
 	          }
 	          var state = {};
 	          state[key] = entries;
@@ -744,20 +738,18 @@
 	        }
 	      }
 	    } else {
-	      //create record
-	      //TODO remove this line
-	      data.id = globalId++;
 	      entries.push(data);
 	      var state = {};
 	      state[key] = entries;
 	      this.setState(state);
+	      Network.create(this, state, key, Object.assign({}, data), type);
 	    }
 	  }
 	});
 	
 	(0, _reactDom.render)(_react2.default.createElement(
 	  _reactRouter.Router,
-	  null,
+	  { history: _reactRouter.hashHistory },
 	  _react2.default.createElement(
 	    _reactRouter.Route,
 	    { path: '/', component: App },
@@ -28470,6 +28462,237 @@
 	
 	module.exports = ReactDOMNullInputValuePropHook;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/process/browser.js */ 3)))
+
+/***/ },
+/* 235 */
+/*!**************************!*\
+  !*** ./app/Validator.js ***!
+  \**************************/
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	//Some useful date utils
+	var DateUtils = exports.DateUtils = {
+	  formatDate: function formatDate(d) {
+	    var month = '' + (d.getMonth() + 1),
+	        day = '' + d.getDate(),
+	        year = d.getFullYear();
+	
+	    if (month.length < 2) month = '0' + month;
+	    if (day.length < 2) day = '0' + day;
+	
+	    return [year, month, day].join('-');
+	  },
+	
+	  stringToDate: function stringToDate(str) {
+	    var dateParts = str.split('-');
+	    var date = new Date();
+	    date.setFullYear(parseInt(dateParts[0]));
+	    date.setMonth(parseInt(dateParts[1]) - 1);
+	    date.setDate(parseInt(dateParts[2]));
+	    date.setHours(0);
+	    date.setMinutes(0);
+	    date.setSeconds(0);
+	    return date;
+	  }
+	};
+	
+	exports.DateUtils = DateUtils;
+	
+	/**
+	 * This function validates a job object with options
+	 * @param {Job} job to validate
+	 * @param {Object} [options] Optional options object
+	 * @param {boolean} [needsId] Whether the job requires an id
+	 */
+	exports.JobValidator = function (job, options) {
+	  var needsId = void 0;
+	  if (options) {
+	    needsId = options.needsId !== undefined ? options.needsId : true;
+	  }
+	  if (typeof job.title !== 'string') {
+	    return false;
+	  }
+	  if (typeof job.hourlyRate !== 'number') {
+	    return false;
+	  }
+	  if (typeof job.taxRate !== 'number') {
+	    return false;
+	  }
+	  if (needsId && typeof job.id !== 'number') {
+	    return false;
+	  }
+	  return true;
+	};
+	
+	/**
+	 * This function validates a Time Entry object with options
+	 * @param {TimeEntry} timeEntry to validate
+	 * @param {Object} [options] Optional options object
+	 * @param {boolean} [needsId] Whether the time entry requires an id
+	 */
+	exports.TimeEntryValidator = function (timeEntry, options) {
+	  var needsId = void 0;
+	  if (options) {
+	    needsId = options.needsId !== undefined ? options.needsId : true;
+	  }
+	  if (!Number.isInteger(timeEntry.time) || timeEntry.time < 0) {
+	    return false;
+	  }
+	  if (!(timeEntry.date instanceof Date)) {
+	    return false;
+	  }
+	  if (typeof timeEntry.summary !== 'string') {
+	    return false;
+	  }
+	  if (!Number.isInteger(timeEntry.jobId)) {
+	    return false;
+	  }
+	  if (needsId && !Number.isInteger(timeEntry.id)) {
+	    return false;
+	  }
+	  return true;
+	};
+	
+	/**
+	 * Parses data into a job object assuming
+	 * all fields are strings.
+	 * @param {Object} data Object with all string values
+	 * @returns {Job} job
+	 */
+	exports.JobParser = function (data) {
+	  var id;
+	  if (data.id && data.id !== 'NEW') {
+	    id = parseInt(data.id);
+	  }
+	  return {
+	    id: id,
+	    title: data.title,
+	    hourlyRate: parseFloat(data.hourlyRate),
+	    taxRate: parseFloat(data.taxRate)
+	  };
+	};
+	
+	/**
+	 * Parses data into a time entry object assuming
+	 * all fields are strings.
+	 * @param {Object} data Object with all string values
+	 * @returns {TimeEntry} timeEntry
+	 */
+	exports.TimeEntryParser = function (data) {
+	  var date;
+	  if (data.date) {
+	    date = DateUtils.stringToDate(data.date);
+	  }
+	  var id;
+	  if (data.id && data.id !== 'NEW') {
+	    id = parseInt(data.id);
+	  }
+	  return {
+	    id: id,
+	    date: date,
+	    time: parseInt(data.time),
+	    summary: data.summary,
+	    jobId: parseInt(data.jobId)
+	  };
+	};
+
+/***/ },
+/* 236 */
+/*!************************!*\
+  !*** ./app/Network.js ***!
+  \************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	//TODO for TimeEntry, convert date to string
+	var Validator = __webpack_require__(/*! ./Validator */ 235);
+	
+	exports.delete = function (component, id, type) {
+	  var routeType = '';
+	  if (type === 'TimeEntry') {
+	    routeType = 'timeEntry';
+	  } else if (type === 'Job') {
+	    routeType = 'job';
+	  }
+	  var route = '/api/v1/' + routeType + '/' + id;
+	  return $.ajax({
+	    url: route,
+	    type: 'DELETE'
+	  }).then(function (response) {
+	    return getAll(component);
+	  });
+	};
+	
+	exports.update = function (component, record, type) {
+	  var routeType = '';
+	  if (type === 'TimeEntry') {
+	    record.date = Validator.DateUtils.formatDate(record.date);
+	    routeType = 'timeEntry';
+	  } else if (type === 'Job') {
+	    routeType = 'job';
+	  }
+	  var route = '/api/v1/' + routeType;
+	  return $.ajax({
+	    url: route,
+	    type: 'PUT',
+	    data: record
+	  }).then(function (response) {
+	    return getAll(component);
+	  });
+	};
+	
+	exports.create = function (component, state, key, record, type) {
+	  var routeType = '';
+	  if (type === 'TimeEntry') {
+	    record.date = Validator.DateUtils.formatDate(record.date);
+	    routeType = 'timeEntry';
+	  } else if (type === 'Job') {
+	    routeType = 'job';
+	  }
+	  var route = '/api/v1/' + routeType;
+	  return $.ajax({
+	    url: route,
+	    type: 'POST',
+	    data: record
+	  }).then(function (response) {
+	    if (response.id !== undefined) {
+	      for (var e = 0; e < state[key].length; e++) {
+	        var element = state[key][e];
+	        if (element.id === 'NEW') {
+	          element.id = response.id;
+	          break;
+	        }
+	      }
+	      component.setState(state);
+	    }
+	    return getAll(component);
+	  });
+	};
+	
+	function getAll(component) {
+	  var route = '/api/v1/all';
+	  return $.ajax({
+	    url: route,
+	    type: 'GET'
+	  }).then(function (response) {
+	    if (response.timeEntries && response.jobs) {
+	      for (var t = 0; t < response.timeEntries.length; t++) {
+	        var timeEntry = response.timeEntries[t];
+	        timeEntry.date = Validator.DateUtils.stringToDate(timeEntry.date);
+	      }
+	      //TODO implement sorting
+	      component.setState({
+	        jobs: response.jobs,
+	        timeEntries: response.timeEntries
+	      });
+	    }
+	  });
+	}
+	
+	exports.getAll = getAll;
 
 /***/ }
 /******/ ]);
