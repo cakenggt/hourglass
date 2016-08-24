@@ -63,564 +63,15 @@
 	
 	var Network = _interopRequireWildcard(_Network);
 	
+	var _TimeSheet = __webpack_require__(/*! ./TimeSheet.jsx */ 237);
+	
+	var _Jobs = __webpack_require__(/*! ./Jobs.jsx */ 238);
+	
+	var _Invoice = __webpack_require__(/*! ./Invoice.jsx */ 239);
+	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var TimeSheet = _react2.default.createClass({
-	  displayName: 'TimeSheet',
-	
-	  getInitialState: function getInitialState() {
-	    return {
-	      newEntry: false
-	    };
-	  },
-	  render: function render() {
-	    var _this = this;
-	
-	    var jobIds = [];
-	    for (var j = 0; j < this.props.data.jobs.length; j++) {
-	      jobIds.push(this.props.data.jobs[j].id);
-	    }
-	    var newTimeEntry = {
-	      id: 'NEW',
-	      time: 1,
-	      date: new Date(),
-	      summary: 'Summary Text',
-	      jobId: 1
-	    };
-	    var newEntryField = this.state.newEntry ? _react2.default.createElement(TimeEntry, {
-	      key: 'new',
-	      data: newTimeEntry,
-	      editable: 'true',
-	      changeData: this.changeNewData,
-	      jobIds: jobIds,
-	      cancel: this.cancel }) : null;
-	    var entries = this.props.data.timeEntries.map(function (result) {
-	      return _react2.default.createElement(TimeEntry, {
-	        key: result.id,
-	        data: result,
-	        editable: 'false',
-	        jobIds: jobIds,
-	        changeData: _this.props.changeData,
-	        cancel: _this.cancel });
-	    });
-	    return _react2.default.createElement(
-	      'div',
-	      null,
-	      _react2.default.createElement(
-	        'div',
-	        { onClick: this.addJob },
-	        'Add Time Entry'
-	      ),
-	      _react2.default.createElement(
-	        'table',
-	        null,
-	        _react2.default.createElement(
-	          'thead',
-	          null,
-	          _react2.default.createElement(
-	            'tr',
-	            null,
-	            _react2.default.createElement(
-	              'th',
-	              null,
-	              'Id'
-	            ),
-	            _react2.default.createElement(
-	              'th',
-	              null,
-	              'Time'
-	            ),
-	            _react2.default.createElement(
-	              'th',
-	              null,
-	              'Date'
-	            ),
-	            _react2.default.createElement(
-	              'th',
-	              null,
-	              'Summary'
-	            ),
-	            _react2.default.createElement(
-	              'th',
-	              null,
-	              'Job Id'
-	            ),
-	            _react2.default.createElement(
-	              'th',
-	              null,
-	              'Edit'
-	            ),
-	            _react2.default.createElement(
-	              'th',
-	              null,
-	              'Delete'
-	            )
-	          )
-	        ),
-	        _react2.default.createElement(
-	          'tbody',
-	          null,
-	          newEntryField,
-	          entries
-	        )
-	      )
-	    );
-	  },
-	  addJob: function addJob() {
-	    this.setState({ newEntry: true });
-	  },
-	  changeNewData: function changeNewData(object) {
-	    this.setState({ newEntry: false });
-	    this.props.changeData(object);
-	  },
-	  cancel: function cancel() {
-	    this.setState({ newEntry: false });
-	  }
-	});
-	
-	var TimeEntry = _react2.default.createClass({
-	  displayName: 'TimeEntry',
-	
-	  getInitialState: function getInitialState() {
-	    return {
-	      editable: this.props.editable == 'true',
-	      data: this.props.data
-	    };
-	  },
-	  render: function render() {
-	    var dateString = _Validator.DateUtils.formatDate(this.state.data.date);
-	    if (this.state.editable) {
-	      var id = this.state.data.id;
-	      var jobIds = this.props.jobIds.map(function (result) {
-	        return _react2.default.createElement(
-	          'option',
-	          {
-	            key: result,
-	            value: result },
-	          result
-	        );
-	      });
-	      return _react2.default.createElement(
-	        'tr',
-	        null,
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          id
-	        ),
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          _react2.default.createElement('input', {
-	            type: 'number',
-	            defaultValue: this.state.data.time,
-	            id: 'time-' + id
-	          })
-	        ),
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          _react2.default.createElement('input', {
-	            type: 'date',
-	            defaultValue: dateString,
-	            id: 'date-' + id
-	          })
-	        ),
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          _react2.default.createElement('input', {
-	            type: 'text',
-	            defaultValue: this.state.data.summary,
-	            id: 'summary-' + id
-	          })
-	        ),
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          _react2.default.createElement(
-	            'select',
-	            {
-	              id: 'jobId-' + id,
-	              defaultValue: this.state.data.jobId
-	            },
-	            jobIds
-	          )
-	        ),
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          _react2.default.createElement(
-	            'span',
-	            { onClick: this.onSave },
-	            'Save'
-	          )
-	        ),
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          _react2.default.createElement(
-	            'span',
-	            { onClick: this.onCancel },
-	            'Cancel'
-	          )
-	        )
-	      );
-	    } else {
-	      return _react2.default.createElement(
-	        'tr',
-	        null,
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          this.state.data.id
-	        ),
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          this.state.data.time
-	        ),
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          dateString
-	        ),
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          this.state.data.summary
-	        ),
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          this.state.data.jobId
-	        ),
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          _react2.default.createElement(
-	            'span',
-	            { onClick: this.onEdit },
-	            'Edit'
-	          )
-	        ),
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          _react2.default.createElement(
-	            'span',
-	            { onClick: this.onDelete },
-	            'Delete'
-	          )
-	        )
-	      );
-	    }
-	  },
-	  onSave: function onSave() {
-	    var data = this.state.data;
-	    data.time = parseInt($('#time-' + data.id).val());
-	    data.date = $('#date-' + data.id).val();
-	    data.summary = $('#summary-' + data.id).val();
-	    data.jobId = parseInt($('#jobId-' + data.id).val());
-	    this.setState({ editable: false, data: data });
-	    this.props.changeData({
-	      type: 'TimeEntry',
-	      data: this.state.data,
-	      delete: false
-	    });
-	  },
-	  onCancel: function onCancel() {
-	    this.setState({ editable: false });
-	    this.props.cancel();
-	  },
-	  onEdit: function onEdit() {
-	    this.setState({ editable: true });
-	  },
-	  onDelete: function onDelete() {
-	    var data = Object.assign({}, this.state.data);
-	    data.date = _Validator.DateUtils.formatDate(data.date);
-	    this.props.changeData({
-	      type: 'TimeEntry',
-	      data: data,
-	      delete: true
-	    });
-	  }
-	});
-	
-	var Jobs = _react2.default.createClass({
-	  displayName: 'Jobs',
-	
-	  getInitialState: function getInitialState() {
-	    return {
-	      newEntry: false
-	    };
-	  },
-	  render: function render() {
-	    var _this2 = this;
-	
-	    var entries = this.props.data.jobs.map(function (result) {
-	      return _react2.default.createElement(JobEntry, {
-	        key: result.id,
-	        data: result,
-	        editable: 'false',
-	        changeData: _this2.props.changeData,
-	        cancel: _this2.cancel });
-	    });
-	    var newJob = {
-	      id: 'NEW',
-	      title: 'New Job',
-	      hourlyRate: 0,
-	      taxRate: 0
-	    };
-	    var newEntryField = this.state.newEntry ? _react2.default.createElement(JobEntry, {
-	      key: 'new',
-	      data: newJob,
-	      editable: 'true',
-	      changeData: this.changeNewData,
-	      cancel: this.cancel }) : null;
-	    return _react2.default.createElement(
-	      'div',
-	      null,
-	      _react2.default.createElement(
-	        'div',
-	        { onClick: this.addJob },
-	        'Add Job'
-	      ),
-	      _react2.default.createElement(
-	        'table',
-	        null,
-	        _react2.default.createElement(
-	          'thead',
-	          null,
-	          _react2.default.createElement(
-	            'tr',
-	            null,
-	            _react2.default.createElement(
-	              'th',
-	              null,
-	              'Id'
-	            ),
-	            _react2.default.createElement(
-	              'th',
-	              null,
-	              'Title'
-	            ),
-	            _react2.default.createElement(
-	              'th',
-	              null,
-	              'Hourly Rate'
-	            ),
-	            _react2.default.createElement(
-	              'th',
-	              null,
-	              'Tax Rate'
-	            ),
-	            _react2.default.createElement(
-	              'th',
-	              null,
-	              'Edit'
-	            ),
-	            _react2.default.createElement(
-	              'th',
-	              null,
-	              'Delete'
-	            )
-	          )
-	        ),
-	        _react2.default.createElement(
-	          'tbody',
-	          null,
-	          newEntryField,
-	          entries
-	        )
-	      )
-	    );
-	  },
-	  addJob: function addJob() {
-	    this.setState({ newEntry: true });
-	  },
-	  changeNewData: function changeNewData(object) {
-	    this.setState({ newEntry: false });
-	    this.props.changeData(object);
-	  },
-	  cancel: function cancel() {
-	    this.setState({ newEntry: false });
-	  }
-	});
-	
-	var JobEntry = _react2.default.createClass({
-	  displayName: 'JobEntry',
-	
-	  getInitialState: function getInitialState() {
-	    return {
-	      editable: this.props.editable == 'true',
-	      data: this.props.data
-	    };
-	  },
-	  render: function render() {
-	    if (this.state.editable) {
-	      var id = this.state.data.id;
-	      return _react2.default.createElement(
-	        'tr',
-	        null,
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          id
-	        ),
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          _react2.default.createElement('input', {
-	            type: 'text',
-	            defaultValue: this.state.data.title,
-	            id: 'title-' + id
-	          })
-	        ),
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          _react2.default.createElement('input', {
-	            type: 'number',
-	            step: '0.01',
-	            defaultValue: this.state.data.hourlyRate,
-	            id: 'hourlyRate-' + id
-	          })
-	        ),
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          _react2.default.createElement('input', {
-	            type: 'number',
-	            step: '0.01',
-	            defaultValue: this.state.data.taxRate,
-	            id: 'taxRate-' + id
-	          })
-	        ),
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          _react2.default.createElement(
-	            'span',
-	            { onClick: this.onSave },
-	            'Save'
-	          )
-	        ),
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          _react2.default.createElement(
-	            'span',
-	            { onClick: this.onCancel },
-	            'Cancel'
-	          )
-	        )
-	      );
-	    } else {
-	      return _react2.default.createElement(
-	        'tr',
-	        null,
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          this.props.data.id
-	        ),
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          this.props.data.title
-	        ),
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          '$',
-	          this.props.data.hourlyRate
-	        ),
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          '$',
-	          this.props.data.taxRate
-	        ),
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          _react2.default.createElement(
-	            'span',
-	            { onClick: this.onEdit },
-	            'Edit'
-	          )
-	        ),
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          _react2.default.createElement(
-	            'span',
-	            { onClick: this.onDelete },
-	            'Delete'
-	          )
-	        )
-	      );
-	    }
-	  },
-	  onSave: function onSave() {
-	    var data = this.state.data;
-	    data.title = $('#title-' + data.id).val();
-	    data.hourlyRate = parseFloat($('#hourlyRate-' + data.id).val());
-	    data.taxRate = parseFloat($('#taxRate-' + data.id).val());
-	    this.setState({ editable: false, data: data });
-	    this.props.changeData({
-	      type: 'Job',
-	      data: this.state.data,
-	      delete: false
-	    });
-	  },
-	  onCancel: function onCancel() {
-	    this.setState({ editable: false });
-	    this.props.cancel();
-	  },
-	  onEdit: function onEdit() {
-	    this.setState({ editable: true });
-	  },
-	  onDelete: function onDelete() {
-	    var data = Object.assign({}, this.state.data);
-	    data.date = _Validator.DateUtils.formatDate(data.date);
-	    this.props.changeData({
-	      type: 'Job',
-	      data: data,
-	      delete: true
-	    });
-	  }
-	});
-	
-	var Invoice = _react2.default.createClass({
-	  displayName: 'Invoice',
-	
-	  render: function render() {
-	    return _react2.default.createElement(
-	      'div',
-	      null,
-	      _react2.default.createElement(
-	        'h2',
-	        null,
-	        'Got Questions?'
-	      ),
-	      _react2.default.createElement(
-	        'p',
-	        null,
-	        'The easiest thing to do is post on our ',
-	        _react2.default.createElement(
-	          'a',
-	          { href: 'http://forum.kirupa.com' },
-	          'forums'
-	        ),
-	        '.'
-	      )
-	    );
-	  }
-	});
 	
 	var App = _react2.default.createClass({
 	  displayName: 'App',
@@ -635,7 +86,7 @@
 	    Network.getAll(this);
 	  },
 	  render: function render() {
-	    var _this3 = this;
+	    var _this = this;
 	
 	    //TODO implement sorting
 	    return _react2.default.createElement(
@@ -682,8 +133,8 @@
 	        { className: 'content' },
 	        _react2.default.Children.map(this.props.children, function (child) {
 	          return _react2.default.cloneElement(child, {
-	            data: _this3.state,
-	            changeData: _this3.changeData
+	            data: _this.state,
+	            changeData: _this.changeData
 	          });
 	        })
 	      )
@@ -757,9 +208,9 @@
 	  _react2.default.createElement(
 	    _reactRouter.Route,
 	    { path: '/', component: App },
-	    _react2.default.createElement(_reactRouter.IndexRoute, { component: TimeSheet }),
-	    _react2.default.createElement(_reactRouter.Route, { path: 'jobs', component: Jobs }),
-	    _react2.default.createElement(_reactRouter.Route, { path: 'invoice', component: Invoice })
+	    _react2.default.createElement(_reactRouter.IndexRoute, { component: _TimeSheet.TimeSheet }),
+	    _react2.default.createElement(_reactRouter.Route, { path: 'jobs', component: _Jobs.Jobs }),
+	    _react2.default.createElement(_reactRouter.Route, { path: 'invoice', component: _Invoice.Invoice })
 	  )
 	), document.getElementById('app'));
 
@@ -28697,6 +28148,628 @@
 	}
 	
 	exports.getAll = getAll;
+
+/***/ },
+/* 237 */
+/*!***************************!*\
+  !*** ./app/TimeSheet.jsx ***!
+  \***************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _Validator = __webpack_require__(/*! ./Validator */ 235);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var TimeSheet = _react2.default.createClass({
+	  displayName: 'TimeSheet',
+	
+	  getInitialState: function getInitialState() {
+	    return {
+	      newEntry: false
+	    };
+	  },
+	  render: function render() {
+	    var _this = this;
+	
+	    var jobIds = [];
+	    for (var j = 0; j < this.props.data.jobs.length; j++) {
+	      jobIds.push(this.props.data.jobs[j].id);
+	    }
+	    var newTimeEntry = {
+	      id: 'NEW',
+	      time: 1,
+	      date: new Date(),
+	      summary: 'Summary Text',
+	      jobId: 1
+	    };
+	    var newEntryField = this.state.newEntry ? _react2.default.createElement(TimeEntry, {
+	      key: 'new',
+	      data: newTimeEntry,
+	      editable: true,
+	      changeData: this.changeNewData,
+	      jobIds: jobIds,
+	      cancel: this.cancel }) : null;
+	    var entries = this.props.data.timeEntries.map(function (result) {
+	      return _react2.default.createElement(TimeEntry, {
+	        key: result.id,
+	        data: result,
+	        editable: false,
+	        jobIds: jobIds,
+	        changeData: _this.props.changeData,
+	        cancel: _this.cancel });
+	    });
+	    return _react2.default.createElement(
+	      'div',
+	      null,
+	      _react2.default.createElement(
+	        'div',
+	        { onClick: this.addJob },
+	        'Add Time Entry'
+	      ),
+	      _react2.default.createElement(
+	        'table',
+	        null,
+	        _react2.default.createElement(
+	          'thead',
+	          null,
+	          _react2.default.createElement(
+	            'tr',
+	            null,
+	            _react2.default.createElement(
+	              'th',
+	              null,
+	              'Id'
+	            ),
+	            _react2.default.createElement(
+	              'th',
+	              null,
+	              'Time'
+	            ),
+	            _react2.default.createElement(
+	              'th',
+	              null,
+	              'Date'
+	            ),
+	            _react2.default.createElement(
+	              'th',
+	              null,
+	              'Summary'
+	            ),
+	            _react2.default.createElement(
+	              'th',
+	              null,
+	              'Job Id'
+	            ),
+	            _react2.default.createElement(
+	              'th',
+	              null,
+	              'Edit'
+	            ),
+	            _react2.default.createElement(
+	              'th',
+	              null,
+	              'Delete'
+	            )
+	          )
+	        ),
+	        _react2.default.createElement(
+	          'tbody',
+	          null,
+	          newEntryField,
+	          entries
+	        )
+	      )
+	    );
+	  },
+	  addJob: function addJob() {
+	    this.setState({ newEntry: true });
+	  },
+	  changeNewData: function changeNewData(object) {
+	    this.setState({ newEntry: false });
+	    this.props.changeData(object);
+	  },
+	  cancel: function cancel() {
+	    this.setState({ newEntry: false });
+	  }
+	});
+	
+	var TimeEntry = _react2.default.createClass({
+	  displayName: 'TimeEntry',
+	
+	  getInitialState: function getInitialState() {
+	    return {
+	      editable: this.props.editable,
+	      data: this.props.data
+	    };
+	  },
+	  render: function render() {
+	    var dateString = _Validator.DateUtils.formatDate(this.state.data.date);
+	    if (this.state.editable) {
+	      var id = this.state.data.id;
+	      var jobIds = this.props.jobIds.map(function (result) {
+	        return _react2.default.createElement(
+	          'option',
+	          {
+	            key: result,
+	            value: result },
+	          result
+	        );
+	      });
+	      return _react2.default.createElement(
+	        'tr',
+	        null,
+	        _react2.default.createElement(
+	          'td',
+	          null,
+	          id
+	        ),
+	        _react2.default.createElement(
+	          'td',
+	          null,
+	          _react2.default.createElement('input', {
+	            type: 'number',
+	            defaultValue: this.state.data.time,
+	            id: 'time-' + id
+	          })
+	        ),
+	        _react2.default.createElement(
+	          'td',
+	          null,
+	          _react2.default.createElement('input', {
+	            type: 'date',
+	            defaultValue: dateString,
+	            id: 'date-' + id
+	          })
+	        ),
+	        _react2.default.createElement(
+	          'td',
+	          null,
+	          _react2.default.createElement('input', {
+	            type: 'text',
+	            defaultValue: this.state.data.summary,
+	            id: 'summary-' + id
+	          })
+	        ),
+	        _react2.default.createElement(
+	          'td',
+	          null,
+	          _react2.default.createElement(
+	            'select',
+	            {
+	              id: 'jobId-' + id,
+	              defaultValue: this.state.data.jobId
+	            },
+	            jobIds
+	          )
+	        ),
+	        _react2.default.createElement(
+	          'td',
+	          null,
+	          _react2.default.createElement(
+	            'span',
+	            { onClick: this.onSave },
+	            'Save'
+	          )
+	        ),
+	        _react2.default.createElement(
+	          'td',
+	          null,
+	          _react2.default.createElement(
+	            'span',
+	            { onClick: this.onCancel },
+	            'Cancel'
+	          )
+	        )
+	      );
+	    } else {
+	      return _react2.default.createElement(
+	        'tr',
+	        null,
+	        _react2.default.createElement(
+	          'td',
+	          null,
+	          this.state.data.id
+	        ),
+	        _react2.default.createElement(
+	          'td',
+	          null,
+	          this.state.data.time
+	        ),
+	        _react2.default.createElement(
+	          'td',
+	          null,
+	          dateString
+	        ),
+	        _react2.default.createElement(
+	          'td',
+	          null,
+	          this.state.data.summary
+	        ),
+	        _react2.default.createElement(
+	          'td',
+	          null,
+	          this.state.data.jobId
+	        ),
+	        _react2.default.createElement(
+	          'td',
+	          null,
+	          _react2.default.createElement(
+	            'span',
+	            { onClick: this.onEdit },
+	            'Edit'
+	          )
+	        ),
+	        _react2.default.createElement(
+	          'td',
+	          null,
+	          _react2.default.createElement(
+	            'span',
+	            { onClick: this.onDelete },
+	            'Delete'
+	          )
+	        )
+	      );
+	    }
+	  },
+	  onSave: function onSave() {
+	    var data = this.state.data;
+	    data.time = parseInt($('#time-' + data.id).val());
+	    data.date = $('#date-' + data.id).val();
+	    data.summary = $('#summary-' + data.id).val();
+	    data.jobId = parseInt($('#jobId-' + data.id).val());
+	    this.setState({ editable: false, data: data });
+	    this.props.changeData({
+	      type: 'TimeEntry',
+	      data: this.state.data,
+	      delete: false
+	    });
+	  },
+	  onCancel: function onCancel() {
+	    this.setState({ editable: false });
+	    this.props.cancel();
+	  },
+	  onEdit: function onEdit() {
+	    this.setState({ editable: true });
+	  },
+	  onDelete: function onDelete() {
+	    var data = Object.assign({}, this.state.data);
+	    data.date = _Validator.DateUtils.formatDate(data.date);
+	    this.props.changeData({
+	      type: 'TimeEntry',
+	      data: data,
+	      delete: true
+	    });
+	  }
+	});
+	
+	exports.TimeSheet = TimeSheet;
+	exports.TimeEntry = TimeEntry;
+
+/***/ },
+/* 238 */
+/*!**********************!*\
+  !*** ./app/Jobs.jsx ***!
+  \**********************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var Jobs = _react2.default.createClass({
+	  displayName: 'Jobs',
+	
+	  getInitialState: function getInitialState() {
+	    return {
+	      newEntry: false
+	    };
+	  },
+	  render: function render() {
+	    var _this = this;
+	
+	    var hasTimeEntries = {};
+	    for (var t = 0; t < this.props.data.timeEntries.length; t++) {
+	      var timeEntry = this.props.data.timeEntries[t];
+	      hasTimeEntries[timeEntry.jobId] = true;
+	    }
+	    var entries = this.props.data.jobs.map(function (result) {
+	      return _react2.default.createElement(JobEntry, {
+	        key: result.id,
+	        data: result,
+	        hasTimeEntries: hasTimeEntries[result.id] == true,
+	        editable: false,
+	        changeData: _this.props.changeData,
+	        cancel: _this.cancel });
+	    });
+	    var newJob = {
+	      id: 'NEW',
+	      title: 'New Job',
+	      hourlyRate: 0,
+	      taxRate: 0
+	    };
+	    var newEntryField = this.state.newEntry ? _react2.default.createElement(JobEntry, {
+	      key: 'new',
+	      data: newJob,
+	      hasTimeEntries: false,
+	      editable: true,
+	      changeData: this.changeNewData,
+	      cancel: this.cancel }) : null;
+	    return _react2.default.createElement(
+	      'div',
+	      null,
+	      _react2.default.createElement(
+	        'div',
+	        { onClick: this.addJob },
+	        'Add Job'
+	      ),
+	      _react2.default.createElement(
+	        'table',
+	        null,
+	        _react2.default.createElement(
+	          'thead',
+	          null,
+	          _react2.default.createElement(
+	            'tr',
+	            null,
+	            _react2.default.createElement(
+	              'th',
+	              null,
+	              'Id'
+	            ),
+	            _react2.default.createElement(
+	              'th',
+	              null,
+	              'Title'
+	            ),
+	            _react2.default.createElement(
+	              'th',
+	              null,
+	              'Hourly Rate'
+	            ),
+	            _react2.default.createElement(
+	              'th',
+	              null,
+	              'Tax Rate'
+	            ),
+	            _react2.default.createElement(
+	              'th',
+	              null,
+	              'Edit'
+	            ),
+	            _react2.default.createElement(
+	              'th',
+	              null,
+	              'Delete'
+	            )
+	          )
+	        ),
+	        _react2.default.createElement(
+	          'tbody',
+	          null,
+	          newEntryField,
+	          entries
+	        )
+	      )
+	    );
+	  },
+	  addJob: function addJob() {
+	    this.setState({ newEntry: true });
+	  },
+	  changeNewData: function changeNewData(object) {
+	    this.setState({ newEntry: false });
+	    this.props.changeData(object);
+	  },
+	  cancel: function cancel() {
+	    this.setState({ newEntry: false });
+	  }
+	});
+	
+	var JobEntry = _react2.default.createClass({
+	  displayName: 'JobEntry',
+	
+	  getInitialState: function getInitialState() {
+	    return {
+	      editable: this.props.editable,
+	      data: this.props.data
+	    };
+	  },
+	  render: function render() {
+	    if (this.state.editable) {
+	      var id = this.state.data.id;
+	      return _react2.default.createElement(
+	        'tr',
+	        null,
+	        _react2.default.createElement(
+	          'td',
+	          null,
+	          id
+	        ),
+	        _react2.default.createElement(
+	          'td',
+	          null,
+	          _react2.default.createElement('input', {
+	            type: 'text',
+	            defaultValue: this.state.data.title,
+	            id: 'title-' + id
+	          })
+	        ),
+	        _react2.default.createElement(
+	          'td',
+	          null,
+	          _react2.default.createElement('input', {
+	            type: 'number',
+	            step: '0.01',
+	            defaultValue: this.state.data.hourlyRate,
+	            id: 'hourlyRate-' + id
+	          })
+	        ),
+	        _react2.default.createElement(
+	          'td',
+	          null,
+	          _react2.default.createElement('input', {
+	            type: 'number',
+	            step: '0.01',
+	            defaultValue: this.state.data.taxRate,
+	            id: 'taxRate-' + id
+	          })
+	        ),
+	        _react2.default.createElement(
+	          'td',
+	          null,
+	          _react2.default.createElement(
+	            'span',
+	            { onClick: this.onSave },
+	            'Save'
+	          )
+	        ),
+	        _react2.default.createElement(
+	          'td',
+	          null,
+	          _react2.default.createElement(
+	            'span',
+	            { onClick: this.onCancel },
+	            'Cancel'
+	          )
+	        )
+	      );
+	    } else {
+	      return _react2.default.createElement(
+	        'tr',
+	        null,
+	        _react2.default.createElement(
+	          'td',
+	          null,
+	          this.props.data.id
+	        ),
+	        _react2.default.createElement(
+	          'td',
+	          null,
+	          this.props.data.title
+	        ),
+	        _react2.default.createElement(
+	          'td',
+	          null,
+	          '$',
+	          this.props.data.hourlyRate
+	        ),
+	        _react2.default.createElement(
+	          'td',
+	          null,
+	          '$',
+	          this.props.data.taxRate
+	        ),
+	        _react2.default.createElement(
+	          'td',
+	          null,
+	          _react2.default.createElement(
+	            'span',
+	            { onClick: this.onEdit },
+	            'Edit'
+	          )
+	        ),
+	        _react2.default.createElement(
+	          'td',
+	          null,
+	          _react2.default.createElement(
+	            'span',
+	            { onClick: this.onDelete },
+	            'Delete'
+	          )
+	        )
+	      );
+	    }
+	  },
+	  onSave: function onSave() {
+	    var data = this.state.data;
+	    data.title = $('#title-' + data.id).val();
+	    data.hourlyRate = parseFloat($('#hourlyRate-' + data.id).val());
+	    data.taxRate = parseFloat($('#taxRate-' + data.id).val());
+	    this.setState({ editable: false, data: data });
+	    this.props.changeData({
+	      type: 'Job',
+	      data: this.state.data,
+	      delete: false
+	    });
+	  },
+	  onCancel: function onCancel() {
+	    this.setState({ editable: false });
+	    this.props.cancel();
+	  },
+	  onEdit: function onEdit() {
+	    this.setState({ editable: true });
+	  },
+	  onDelete: function onDelete() {
+	    var del = true;
+	    if (this.props.hasTimeEntries) {
+	      del = confirm('This Job has associated time entries that will be deleted if this is deleted.\n\nDo you wish to proceed?');
+	    }
+	    if (del) {
+	      var data = Object.assign({}, this.state.data);
+	      this.props.changeData({
+	        type: 'Job',
+	        data: data,
+	        delete: true
+	      });
+	    }
+	  }
+	});
+	
+	exports.Jobs = Jobs;
+	exports.JobEntry = JobEntry;
+
+/***/ },
+/* 239 */
+/*!*************************!*\
+  !*** ./app/Invoice.jsx ***!
+  \*************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var Invoice = _react2.default.createClass({
+	  displayName: "Invoice",
+	
+	  render: function render() {
+	    return _react2.default.createElement(
+	      "div",
+	      null,
+	      _react2.default.createElement(
+	        "h2",
+	        null,
+	        "Got Questions?"
+	      ),
+	      _react2.default.createElement(
+	        "p",
+	        null,
+	        "The easiest thing to do is post on our ",
+	        _react2.default.createElement(
+	          "a",
+	          { href: "http://forum.kirupa.com" },
+	          "forums"
+	        ),
+	        "."
+	      )
+	    );
+	  }
+	});
+	
+	exports.Invoice = Invoice;
 
 /***/ }
 /******/ ]);
