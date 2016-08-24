@@ -27928,7 +27928,7 @@
 	'use strict';
 	
 	//Some useful date utils
-	var DateUtils = exports.DateUtils = {
+	var DateUtils = {
 	  formatDate: function formatDate(d) {
 	    var month = '' + (d.getMonth() + 1),
 	        day = '' + d.getDate(),
@@ -27950,6 +27950,25 @@
 	    date.setMinutes(0);
 	    date.setSeconds(0);
 	    return date;
+	  },
+	
+	  isValidDateString: function isValidDateString(str) {
+	    if (!str || typeof str !== 'string') {
+	      return false;
+	    }
+	    var parts = str.split('-');
+	    if (parts.length !== 3) {
+	      return false;
+	    }
+	    for (var i = 0; i < parts.length; i++) {
+	      var part = parts[i];
+	      var num = parseInt(part);
+	      if (!Number.isInteger(num)) {
+	        return false;
+	      }
+	      //TODO you can do more validation of the date values
+	    }
+	    return true;
 	  }
 	};
 	
@@ -28741,36 +28760,214 @@
   \*************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 	
 	var _react = __webpack_require__(/*! react */ 1);
 	
 	var _react2 = _interopRequireDefault(_react);
 	
+	var _Validator = __webpack_require__(/*! ./Validator */ 235);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var Invoice = _react2.default.createClass({
-	  displayName: "Invoice",
+	  displayName: 'Invoice',
 	
+	  getInitialState: function getInitialState() {
+	    return {
+	      dateBeginning: null,
+	      dateEnd: null,
+	      jobId: null
+	    };
+	  },
 	  render: function render() {
+	    var jobIds = [];
+	    var jobMap = {};
+	    for (var j = 0; j < this.props.data.jobs.length; j++) {
+	      jobIds.push(this.props.data.jobs[j].id);
+	      jobMap[this.props.data.jobs[j].id] = this.props.data.jobs[j];
+	    }
+	    var dateBeginning = _Validator.DateUtils.isValidDateString(this.state.dateBeginning) ? _Validator.DateUtils.stringToDate(this.state.dateBeginning) : null;
+	    var dateEnd = _Validator.DateUtils.isValidDateString(this.state.dateEnd) ? _Validator.DateUtils.stringToDate(this.state.dateEnd) : null;
+	    var jobId = this.state.jobId;
+	    var job = jobMap[jobId];
+	    var jobIdElements = jobIds.map(function (result) {
+	      return _react2.default.createElement(
+	        'option',
+	        {
+	          key: result,
+	          value: result },
+	        result
+	      );
+	    });
+	    jobIdElements.unshift(_react2.default.createElement('option', {
+	      key: 'empty',
+	      value: null }));
 	    return _react2.default.createElement(
-	      "div",
+	      'div',
 	      null,
 	      _react2.default.createElement(
-	        "h2",
+	        'div',
+	        { className: 'invoiceHeader' },
+	        'Date Beginning:',
+	        _react2.default.createElement('input', {
+	          type: 'date',
+	          defaultValue: this.state.dateBeginning,
+	          onChange: this.changeDateBeginning
+	        }),
+	        'Date End:',
+	        _react2.default.createElement('input', {
+	          type: 'date',
+	          defaultValue: this.state.dateEnd,
+	          onChange: this.changeDateEnd
+	        }),
+	        'Job Id:',
+	        _react2.default.createElement(
+	          'select',
+	          {
+	            defaultValue: this.state.jobId,
+	            onChange: this.changeJobId
+	          },
+	          jobIdElements
+	        )
+	      ),
+	      _react2.default.createElement(InvoiceDetails, {
+	        data: this.props.data,
+	        dateBeginning: dateBeginning,
+	        dateEnd: dateEnd,
+	        jobId: jobId,
+	        job: job
+	      })
+	    );
+	  },
+	  changeDateBeginning: function changeDateBeginning(e) {
+	    this.setState({ dateBeginning: e.target.value });
+	  },
+	  changeDateEnd: function changeDateEnd(e) {
+	    this.setState({ dateEnd: e.target.value });
+	  },
+	  changeJobId: function changeJobId(e) {
+	    this.setState({ jobId: parseInt(e.target.value) });
+	  }
+	});
+	
+	var InvoiceDetails = _react2.default.createClass({
+	  displayName: 'InvoiceDetails',
+	
+	  render: function render() {
+	    var dateBeginning = this.props.dateBeginning;
+	    var dateEnd = this.props.dateEnd;
+	    var jobId = this.props.jobId;
+	    var job = this.props.job;
+	    var data = this.props.data;
+	    var timeEntries = data.timeEntries;
+	    //Sort by date
+	    timeEntries.sort(function (a, b) {
+	      return a.date - b.date;
+	    });
+	    var subtotal = 0;
+	    var tax = 0;
+	    var total = 0;
+	    var shownEntries = [];
+	    if (job) {
+	      for (var t = 0; t < timeEntries.length; t++) {
+	        var timeEntry = timeEntries[t];
+	        if ((!dateBeginning || timeEntry.date >= dateBeginning) && (!dateEnd || timeEntry.date <= dateEnd) && (!jobId || timeEntry.jobId === jobId)) {
+	          shownEntries.push(timeEntry);
+	          subtotal += timeEntry.time / 60 * job.hourlyRate;
+	        }
+	      }
+	      tax = subtotal * job.taxRate;
+	      total = subtotal + tax;
+	    }
+	    var invoiceTimeRows = shownEntries.map(function (result) {
+	      return _react2.default.createElement(InvoiceTimeRow, {
+	        key: result.id,
+	        time: result.time,
+	        date: result.date,
+	        summary: result.summary
+	      });
+	    });
+	    return _react2.default.createElement(
+	      'div',
+	      { className: 'invoiceDetails' },
+	      'Entries',
+	      _react2.default.createElement(
+	        'table',
 	        null,
-	        "Got Questions?"
+	        _react2.default.createElement(
+	          'thead',
+	          null,
+	          _react2.default.createElement(
+	            'tr',
+	            null,
+	            _react2.default.createElement(
+	              'th',
+	              null,
+	              'Time'
+	            ),
+	            _react2.default.createElement(
+	              'th',
+	              null,
+	              'Date'
+	            ),
+	            _react2.default.createElement(
+	              'th',
+	              null,
+	              'Summary'
+	            )
+	          )
+	        ),
+	        _react2.default.createElement(
+	          'tbody',
+	          null,
+	          invoiceTimeRows
+	        )
 	      ),
 	      _react2.default.createElement(
-	        "p",
+	        'div',
 	        null,
-	        "The easiest thing to do is post on our ",
-	        _react2.default.createElement(
-	          "a",
-	          { href: "http://forum.kirupa.com" },
-	          "forums"
-	        ),
-	        "."
+	        'Subtotal: $',
+	        subtotal.toFixed(2)
+	      ),
+	      _react2.default.createElement(
+	        'div',
+	        null,
+	        'Tax: $',
+	        tax.toFixed(2)
+	      ),
+	      _react2.default.createElement(
+	        'div',
+	        null,
+	        'Total: $',
+	        total.toFixed(2)
+	      )
+	    );
+	  }
+	});
+	
+	var InvoiceTimeRow = _react2.default.createClass({
+	  displayName: 'InvoiceTimeRow',
+	
+	  render: function render() {
+	    var dateString = _Validator.DateUtils.formatDate(this.props.date);
+	    return _react2.default.createElement(
+	      'tr',
+	      null,
+	      _react2.default.createElement(
+	        'td',
+	        null,
+	        this.props.time
+	      ),
+	      _react2.default.createElement(
+	        'td',
+	        null,
+	        dateString
+	      ),
+	      _react2.default.createElement(
+	        'td',
+	        null,
+	        this.props.summary
 	      )
 	    );
 	  }

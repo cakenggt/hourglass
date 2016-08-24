@@ -1,5 +1,5 @@
 //Some useful date utils
-var DateUtils = exports.DateUtils = {
+var DateUtils = {
   formatDate: function(d) {
     var month = '' + (d.getMonth() + 1),
       day = '' + d.getDate(),
@@ -21,6 +21,25 @@ var DateUtils = exports.DateUtils = {
     date.setMinutes(0);
     date.setSeconds(0);
     return date;
+  },
+
+  isValidDateString: function(str){
+    if (!str || typeof str !== 'string'){
+      return false;
+    }
+    var parts = str.split('-');
+    if (parts.length !== 3){
+      return false;
+    }
+    for (var i = 0; i < parts.length; i++){
+      var part = parts[i];
+      var num = parseInt(part);
+      if (!Number.isInteger(num)){
+        return false;
+      }
+      //TODO you can do more validation of the date values
+    }
+    return true;
   }
 };
 

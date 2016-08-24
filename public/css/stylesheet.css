@@ -23,7 +23,7 @@ ul.header li a {
   display: inline-block;
 }
 .content {
-  background-color: #FFF;
+  background-color: #F1F1F1;
   padding: 20px;
 }
 .content h2 {
@@ -35,4 +35,16 @@ ul.header li a {
 }
 .active {
   background-color: #0099FF;
+}
+.invoiceDetails {
+  width: 500px;
+  height: 800px;
+  background-color: #FFFFFF;
+  box-shadow: 0px 10px 30px gray;
+  padding: 10px;
+  margin: 10px auto;
+}
+.invoiceHeader {
+  width: 600px;
+  margin: 0px auto;
 }
