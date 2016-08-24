@@ -28162,6 +28162,8 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
+	var _reactRouter = __webpack_require__(/*! react-router */ 34);
+	
 	var _Validator = __webpack_require__(/*! ./Validator */ 235);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -28204,14 +28206,19 @@
 	        changeData: _this.props.changeData,
 	        cancel: _this.cancel });
 	    });
+	    var addTimeOrAddJob = this.props.data.jobs.length === 0 ? _react2.default.createElement(
+	      _reactRouter.Link,
+	      { to: '/jobs', activeClassName: 'active' },
+	      'You must add a job to add a time entry. Go to Jobs'
+	    ) : _react2.default.createElement(
+	      'div',
+	      { onClick: this.addJob },
+	      'Add Time Entry'
+	    );
 	    return _react2.default.createElement(
 	      'div',
 	      null,
-	      _react2.default.createElement(
-	        'div',
-	        { onClick: this.addJob },
-	        'Add Time Entry'
-	      ),
+	      addTimeOrAddJob,
 	      _react2.default.createElement(
 	        'table',
 	        null,

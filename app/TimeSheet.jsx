@@ -1,4 +1,5 @@
 import React from 'react';
+import {Link} from 'react-router';
 import {DateUtils} from './Validator';
 
 var TimeSheet = React.createClass({
@@ -39,11 +40,19 @@ var TimeSheet = React.createClass({
           cancel={this.cancel}/>
       );
     });
+    var addTimeOrAddJob = this.props.data.jobs.length === 0 ? (
+      <Link to="/jobs" activeClassName="active">
+        You must add a job to add a time entry. Go to Jobs
+      </Link>
+    ) :
+    (
+      <div onClick={this.addJob}>
+        Add Time Entry
+      </div>
+    );
     return (
       <div>
-        <div onClick={this.addJob}>
-          Add Time Entry
-        </div>
+        {addTimeOrAddJob}
         <table>
           <thead>
             <tr>
