@@ -13,7 +13,7 @@ var DateUtils = {
 
   stringToDate: function(str){
     var dateParts = str.split('-');
-    var date = new Date();
+    var date = new Date(0);
     date.setFullYear(parseInt(dateParts[0]));
     date.setMonth(parseInt(dateParts[1])-1);
     date.setDate(parseInt(dateParts[2]));

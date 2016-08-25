@@ -41,10 +41,48 @@ ul.header li a {
   height: 800px;
   background-color: #FFFFFF;
   box-shadow: 0px 10px 30px gray;
-  padding: 10px;
+  padding: 40px;
   margin: 10px auto;
 }
 .invoiceHeader {
-  width: 600px;
-  margin: 0px auto;
+  width: 700px;
+  margin: 10px auto;
+}
+.printButton {
+  display: block;
+  text-align: center;
+}
+td {
+  text-align: center;
+}
+.tableRow {
+  background-color: #fffacf;
+}
+.altTableRow {
+  background-color: #a9a9a9;
+}
+table {
+  width: 100%;
+  box-shadow: 0 2px 5px gray;
+  border-collapse: collapse;
+}
+th {
+  background-color: black;
+  color: yellow;
+}
+.tableContainer {
+  text-align: center;
+}
+.add-button {
+  background-color: lightgray;
+  border-radius: 3px;
+  padding: 3px;
+  margin: 7px;
+  text-align: center;
+  box-shadow: 0 2px 5px gray;
+  display: inline-block;
+  cursor: pointer;
+}
+.material-icons {
+  cursor: pointer;
 }

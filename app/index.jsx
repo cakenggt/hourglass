@@ -21,7 +21,14 @@ var App = React.createClass({
     //TODO implement sorting
     return (
       <div>
-        <h1>Hourglass</h1>
+        <h1>
+          <i
+            className="material-icons"
+            title="Hourglass">
+            hourglass_empty
+          </i>
+          Hourglass
+        </h1>
         <ul className="header">
           <li><IndexLink to="/" activeClassName="active">Time Sheet</IndexLink></li>
           <li><Link to="/jobs" activeClassName="active">Jobs</Link></li>

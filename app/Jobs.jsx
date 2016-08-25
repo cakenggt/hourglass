@@ -12,7 +12,8 @@ var Jobs = React.createClass({
       var timeEntry = this.props.data.timeEntries[t];
       hasTimeEntries[timeEntry.jobId] = true;
     }
-    var entries = this.props.data.jobs.map(result => {
+    var entries = this.props.data.jobs.map((result, i) => {
+      var className = i%2 == 0 ? 'tableRow' : 'altTableRow';
       return (
         <JobEntry
           key={result.id}
@@ -20,7 +21,8 @@ var Jobs = React.createClass({
           hasTimeEntries={hasTimeEntries[result.id] == true}
           editable={false}
           changeData={this.props.changeData}
-          cancel={this.cancel}/>
+          cancel={this.cancel}
+          className={className}/>
       );
     });
     var newJob = {
@@ -36,22 +38,25 @@ var Jobs = React.createClass({
         hasTimeEntries={false}
         editable={true}
         changeData={this.changeNewData}
-        cancel={this.cancel}/> :
+        cancel={this.cancel}
+        className='altTableRow'/> :
       null;
     return (
-      <div>
-        <div onClick={this.addJob}>
+      <div
+        className="tableContainer">
+        <div
+          className="add-button"
+          onClick={this.addJob}>
           Add Job
         </div>
         <table>
           <thead>
             <tr>
-              <th>Id</th>
-              <th>Title</th>
-              <th>Hourly Rate</th>
-              <th>Tax Rate</th>
-              <th>Edit</th>
-              <th>Delete</th>
+              <th style={{width: '30%'}}>Title</th>
+              <th style={{width: '30%'}}>Hourly Rate</th>
+              <th style={{width: '30%'}}>Tax Rate</th>
+              <th style={{width: '5%'}}></th>{/*Edit*/}
+              <th style={{width: '5%'}}></th>{/*Delete*/}
             </tr>
           </thead>
           <tbody>
@@ -85,14 +90,15 @@ var JobEntry = React.createClass({
     if (this.state.editable){
       var id = this.state.data.id;
       return (
-        <tr>
-          <td>{id}</td>
+        <tr
+          className={this.props.className}
+        >
           <td><input
                 type="text"
                 defaultValue={this.state.data.title}
                 id={'title-'+id}
               /></td>
-          <td><input
+          <td>$<input
                 type="number"
                 step="0.01"
                 defaultValue={this.state.data.hourlyRate}
@@ -103,28 +109,49 @@ var JobEntry = React.createClass({
                 step="0.01"
                 defaultValue={this.state.data.taxRate}
                 id={'taxRate-'+id}
-              /></td>
+              />%</td>
           <td>
-            <span onClick={this.onSave}>Save</span>
+            <i
+              className="material-icons"
+              onClick={this.onSave}
+              title="Save">
+              done
+            </i>
           </td>
           <td>
-            <span onClick={this.onCancel}>Cancel</span>
+            <i
+              className="material-icons"
+              onClick={this.onCancel}
+              title="Cancel">
+              clear
+            </i>
           </td>
         </tr>
       )
     }
     else{
       return (
-        <tr>
-          <td>{this.props.data.id}</td>
+        <tr
+          className={this.props.className}
+        >
           <td>{this.props.data.title}</td>
           <td>${this.props.data.hourlyRate}</td>
-          <td>${this.props.data.taxRate}</td>
+          <td>{this.props.data.taxRate}%</td>
           <td>
-            <span onClick={this.onEdit}>Edit</span>
+            <i
+              className="material-icons"
+              onClick={this.onEdit}
+              title="Edit">
+              mode_edit
+            </i>
           </td>
           <td>
-            <span onClick={this.onDelete}>Delete</span>
+            <i
+              className="material-icons"
+              onClick={this.onDelete}
+              title="Delete">
+              delete
+            </i>
           </td>
         </tr>
       )

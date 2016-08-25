@@ -95,6 +95,13 @@
 	      _react2.default.createElement(
 	        'h1',
 	        null,
+	        _react2.default.createElement(
+	          'i',
+	          {
+	            className: 'material-icons',
+	            title: 'Hourglass' },
+	          'hourglass_empty'
+	        ),
 	        'Hourglass'
 	      ),
 	      _react2.default.createElement(
@@ -27942,7 +27949,7 @@
 	
 	  stringToDate: function stringToDate(str) {
 	    var dateParts = str.split('-');
-	    var date = new Date();
+	    var date = new Date(0);
 	    date.setFullYear(parseInt(dateParts[0]));
 	    date.setMonth(parseInt(dateParts[1]) - 1);
 	    date.setDate(parseInt(dateParts[2]));
@@ -28198,10 +28205,7 @@
 	  render: function render() {
 	    var _this = this;
 	
-	    var jobIds = [];
-	    for (var j = 0; j < this.props.data.jobs.length; j++) {
-	      jobIds.push(this.props.data.jobs[j].id);
-	    }
+	    var jobs = this.props.data.jobs;
 	    var newTimeEntry = {
 	      id: 'NEW',
 	      time: 1,
@@ -28214,29 +28218,35 @@
 	      data: newTimeEntry,
 	      editable: true,
 	      changeData: this.changeNewData,
-	      jobIds: jobIds,
-	      cancel: this.cancel }) : null;
-	    var entries = this.props.data.timeEntries.map(function (result) {
+	      jobs: jobs,
+	      cancel: this.cancel,
+	      className: 'altTableRow' }) : null;
+	    var entries = this.props.data.timeEntries.map(function (result, i) {
+	      var className = i % 2 == 0 ? 'tableRow' : 'altTableRow';
 	      return _react2.default.createElement(TimeEntry, {
 	        key: result.id,
 	        data: result,
 	        editable: false,
-	        jobIds: jobIds,
+	        jobs: jobs,
 	        changeData: _this.props.changeData,
-	        cancel: _this.cancel });
+	        cancel: _this.cancel,
+	        className: className });
 	    });
 	    var addTimeOrAddJob = this.props.data.jobs.length === 0 ? _react2.default.createElement(
 	      _reactRouter.Link,
-	      { to: '/jobs', activeClassName: 'active' },
+	      { to: '/jobs' },
 	      'You must add a job to add a time entry. Go to Jobs'
 	    ) : _react2.default.createElement(
 	      'div',
-	      { onClick: this.addJob },
+	      {
+	        className: 'add-button',
+	        onClick: this.addTimeEntry },
 	      'Add Time Entry'
 	    );
 	    return _react2.default.createElement(
 	      'div',
-	      null,
+	      {
+	        className: 'tableContainer' },
 	      addTimeOrAddJob,
 	      _react2.default.createElement(
 	        'table',
@@ -28249,39 +28259,26 @@
 	            null,
 	            _react2.default.createElement(
 	              'th',
-	              null,
-	              'Id'
-	            ),
-	            _react2.default.createElement(
-	              'th',
-	              null,
+	              { style: { width: '20%' } },
 	              'Time'
 	            ),
 	            _react2.default.createElement(
 	              'th',
-	              null,
+	              { style: { width: '20%' } },
 	              'Date'
 	            ),
 	            _react2.default.createElement(
 	              'th',
-	              null,
+	              { style: { width: '30%' } },
 	              'Summary'
 	            ),
 	            _react2.default.createElement(
 	              'th',
-	              null,
-	              'Job Id'
+	              { style: { width: '20%' } },
+	              'Job'
 	            ),
-	            _react2.default.createElement(
-	              'th',
-	              null,
-	              'Edit'
-	            ),
-	            _react2.default.createElement(
-	              'th',
-	              null,
-	              'Delete'
-	            )
+	            _react2.default.createElement('th', { style: { width: '5%' } }),
+	            _react2.default.createElement('th', { style: { width: '5%' } })
 	          )
 	        ),
 	        _react2.default.createElement(
@@ -28293,7 +28290,7 @@
 	      )
 	    );
 	  },
-	  addJob: function addJob() {
+	  addTimeEntry: function addTimeEntry() {
 	    this.setState({ newEntry: true });
 	  },
 	  changeNewData: function changeNewData(object) {
@@ -28318,23 +28315,20 @@
 	    var dateString = _Validator.DateUtils.formatDate(this.state.data.date);
 	    if (this.state.editable) {
 	      var id = this.state.data.id;
-	      var jobIds = this.props.jobIds.map(function (result) {
+	      var jobs = this.props.jobs.map(function (result) {
 	        return _react2.default.createElement(
 	          'option',
 	          {
-	            key: result,
-	            value: result },
-	          result
+	            key: result.id,
+	            value: result.id },
+	          result.title
 	        );
 	      });
 	      return _react2.default.createElement(
 	        'tr',
-	        null,
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          id
-	        ),
+	        {
+	          className: this.props.className
+	        },
 	        _react2.default.createElement(
 	          'td',
 	          null,
@@ -28371,37 +28365,48 @@
 	              id: 'jobId-' + id,
 	              defaultValue: this.state.data.jobId
 	            },
-	            jobIds
+	            jobs
 	          )
 	        ),
 	        _react2.default.createElement(
 	          'td',
 	          null,
 	          _react2.default.createElement(
-	            'span',
-	            { onClick: this.onSave },
-	            'Save'
+	            'i',
+	            {
+	              className: 'material-icons',
+	              onClick: this.onSave,
+	              title: 'Save' },
+	            'done'
 	          )
 	        ),
 	        _react2.default.createElement(
 	          'td',
 	          null,
 	          _react2.default.createElement(
-	            'span',
-	            { onClick: this.onCancel },
-	            'Cancel'
+	            'i',
+	            {
+	              className: 'material-icons',
+	              onClick: this.onCancel,
+	              title: 'Cancel' },
+	            'clear'
 	          )
 	        )
 	      );
 	    } else {
+	      var job;
+	      for (var i = 0; i < this.props.jobs.length; i++) {
+	        var j = this.props.jobs[i];
+	        if (j.id === this.state.data.jobId) {
+	          job = j;
+	          break;
+	        }
+	      }
 	      return _react2.default.createElement(
 	        'tr',
-	        null,
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          this.state.data.id
-	        ),
+	        {
+	          className: this.props.className
+	        },
 	        _react2.default.createElement(
 	          'td',
 	          null,
@@ -28420,24 +28425,30 @@
 	        _react2.default.createElement(
 	          'td',
 	          null,
-	          this.state.data.jobId
+	          job.title
 	        ),
 	        _react2.default.createElement(
 	          'td',
 	          null,
 	          _react2.default.createElement(
-	            'span',
-	            { onClick: this.onEdit },
-	            'Edit'
+	            'i',
+	            {
+	              className: 'material-icons',
+	              onClick: this.onEdit,
+	              title: 'Edit' },
+	            'mode_edit'
 	          )
 	        ),
 	        _react2.default.createElement(
 	          'td',
 	          null,
 	          _react2.default.createElement(
-	            'span',
-	            { onClick: this.onDelete },
-	            'Delete'
+	            'i',
+	            {
+	              className: 'material-icons',
+	              onClick: this.onDelete,
+	              title: 'Delete' },
+	            'delete'
 	          )
 	        )
 	      );
@@ -28508,14 +28519,16 @@
 	      var timeEntry = this.props.data.timeEntries[t];
 	      hasTimeEntries[timeEntry.jobId] = true;
 	    }
-	    var entries = this.props.data.jobs.map(function (result) {
+	    var entries = this.props.data.jobs.map(function (result, i) {
+	      var className = i % 2 == 0 ? 'tableRow' : 'altTableRow';
 	      return _react2.default.createElement(JobEntry, {
 	        key: result.id,
 	        data: result,
 	        hasTimeEntries: hasTimeEntries[result.id] == true,
 	        editable: false,
 	        changeData: _this.props.changeData,
-	        cancel: _this.cancel });
+	        cancel: _this.cancel,
+	        className: className });
 	    });
 	    var newJob = {
 	      id: 'NEW',
@@ -28529,13 +28542,17 @@
 	      hasTimeEntries: false,
 	      editable: true,
 	      changeData: this.changeNewData,
-	      cancel: this.cancel }) : null;
+	      cancel: this.cancel,
+	      className: 'altTableRow' }) : null;
 	    return _react2.default.createElement(
 	      'div',
-	      null,
+	      {
+	        className: 'tableContainer' },
 	      _react2.default.createElement(
 	        'div',
-	        { onClick: this.addJob },
+	        {
+	          className: 'add-button',
+	          onClick: this.addJob },
 	        'Add Job'
 	      ),
 	      _react2.default.createElement(
@@ -28549,34 +28566,21 @@
 	            null,
 	            _react2.default.createElement(
 	              'th',
-	              null,
-	              'Id'
-	            ),
-	            _react2.default.createElement(
-	              'th',
-	              null,
+	              { style: { width: '30%' } },
 	              'Title'
 	            ),
 	            _react2.default.createElement(
 	              'th',
-	              null,
+	              { style: { width: '30%' } },
 	              'Hourly Rate'
 	            ),
 	            _react2.default.createElement(
 	              'th',
-	              null,
+	              { style: { width: '30%' } },
 	              'Tax Rate'
 	            ),
-	            _react2.default.createElement(
-	              'th',
-	              null,
-	              'Edit'
-	            ),
-	            _react2.default.createElement(
-	              'th',
-	              null,
-	              'Delete'
-	            )
+	            _react2.default.createElement('th', { style: { width: '5%' } }),
+	            _react2.default.createElement('th', { style: { width: '5%' } })
 	          )
 	        ),
 	        _react2.default.createElement(
@@ -28614,12 +28618,9 @@
 	      var id = this.state.data.id;
 	      return _react2.default.createElement(
 	        'tr',
-	        null,
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          id
-	        ),
+	        {
+	          className: this.props.className
+	        },
 	        _react2.default.createElement(
 	          'td',
 	          null,
@@ -28632,6 +28633,7 @@
 	        _react2.default.createElement(
 	          'td',
 	          null,
+	          '$',
 	          _react2.default.createElement('input', {
 	            type: 'number',
 	            step: '0.01',
@@ -28647,36 +28649,40 @@
 	            step: '0.01',
 	            defaultValue: this.state.data.taxRate,
 	            id: 'taxRate-' + id
-	          })
+	          }),
+	          '%'
 	        ),
 	        _react2.default.createElement(
 	          'td',
 	          null,
 	          _react2.default.createElement(
-	            'span',
-	            { onClick: this.onSave },
-	            'Save'
+	            'i',
+	            {
+	              className: 'material-icons',
+	              onClick: this.onSave,
+	              title: 'Save' },
+	            'done'
 	          )
 	        ),
 	        _react2.default.createElement(
 	          'td',
 	          null,
 	          _react2.default.createElement(
-	            'span',
-	            { onClick: this.onCancel },
-	            'Cancel'
+	            'i',
+	            {
+	              className: 'material-icons',
+	              onClick: this.onCancel,
+	              title: 'Cancel' },
+	            'clear'
 	          )
 	        )
 	      );
 	    } else {
 	      return _react2.default.createElement(
 	        'tr',
-	        null,
-	        _react2.default.createElement(
-	          'td',
-	          null,
-	          this.props.data.id
-	        ),
+	        {
+	          className: this.props.className
+	        },
 	        _react2.default.createElement(
 	          'td',
 	          null,
@@ -28691,25 +28697,31 @@
 	        _react2.default.createElement(
 	          'td',
 	          null,
-	          '$',
-	          this.props.data.taxRate
+	          this.props.data.taxRate,
+	          '%'
 	        ),
 	        _react2.default.createElement(
 	          'td',
 	          null,
 	          _react2.default.createElement(
-	            'span',
-	            { onClick: this.onEdit },
-	            'Edit'
+	            'i',
+	            {
+	              className: 'material-icons',
+	              onClick: this.onEdit,
+	              title: 'Edit' },
+	            'mode_edit'
 	          )
 	        ),
 	        _react2.default.createElement(
 	          'td',
 	          null,
 	          _react2.default.createElement(
-	            'span',
-	            { onClick: this.onDelete },
-	            'Delete'
+	            'i',
+	            {
+	              className: 'material-icons',
+	              onClick: this.onDelete,
+	              title: 'Delete' },
+	            'delete'
 	          )
 	        )
 	      );
@@ -28768,36 +28780,40 @@
 	
 	var _Validator = __webpack_require__(/*! ./Validator */ 235);
 	
+	var _asciiTable = __webpack_require__(/*! ascii-table */ 240);
+	
+	var _asciiTable2 = _interopRequireDefault(_asciiTable);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var Invoice = _react2.default.createClass({
 	  displayName: 'Invoice',
 	
 	  getInitialState: function getInitialState() {
+	    var todayStr = _Validator.DateUtils.formatDate(new Date());
 	    return {
-	      dateBeginning: null,
-	      dateEnd: null,
-	      jobId: null
+	      dateBeginning: todayStr,
+	      dateEnd: todayStr,
+	      jobId: ''
 	    };
 	  },
 	  render: function render() {
-	    var jobIds = [];
 	    var jobMap = {};
 	    for (var j = 0; j < this.props.data.jobs.length; j++) {
-	      jobIds.push(this.props.data.jobs[j].id);
-	      jobMap[this.props.data.jobs[j].id] = this.props.data.jobs[j];
+	      var job = this.props.data.jobs[j];
+	      jobMap[job.id] = job;
 	    }
 	    var dateBeginning = _Validator.DateUtils.isValidDateString(this.state.dateBeginning) ? _Validator.DateUtils.stringToDate(this.state.dateBeginning) : null;
 	    var dateEnd = _Validator.DateUtils.isValidDateString(this.state.dateEnd) ? _Validator.DateUtils.stringToDate(this.state.dateEnd) : null;
 	    var jobId = this.state.jobId;
 	    var job = jobMap[jobId];
-	    var jobIdElements = jobIds.map(function (result) {
+	    var jobIdElements = this.props.data.jobs.map(function (result) {
 	      return _react2.default.createElement(
 	        'option',
 	        {
-	          key: result,
-	          value: result },
-	        result
+	          key: result.id,
+	          value: result.id },
+	        result.title
 	      );
 	    });
 	    jobIdElements.unshift(_react2.default.createElement('option', {
@@ -28812,30 +28828,45 @@
 	        'Date Beginning:',
 	        _react2.default.createElement('input', {
 	          type: 'date',
-	          defaultValue: this.state.dateBeginning,
+	          value: this.state.dateBeginning,
 	          onChange: this.changeDateBeginning
 	        }),
-	        'Date End:',
+	        '  Date End:',
 	        _react2.default.createElement('input', {
 	          type: 'date',
-	          defaultValue: this.state.dateEnd,
+	          value: this.state.dateEnd,
 	          onChange: this.changeDateEnd
 	        }),
-	        'Job Id:',
+	        '  Job:',
 	        _react2.default.createElement(
 	          'select',
 	          {
-	            defaultValue: this.state.jobId,
+	            value: this.state.jobId,
 	            onChange: this.changeJobId
 	          },
 	          jobIdElements
+	        ),
+	        ' '
+	      ),
+	      _react2.default.createElement(
+	        'div',
+	        {
+	          className: 'printButton'
+	        },
+	        _react2.default.createElement(
+	          'i',
+	          {
+	            className: 'material-icons',
+	            onClick: this.printInvoice,
+	            title: 'Print'
+	          },
+	          'printer'
 	        )
 	      ),
 	      _react2.default.createElement(InvoiceDetails, {
 	        data: this.props.data,
 	        dateBeginning: dateBeginning,
 	        dateEnd: dateEnd,
-	        jobId: jobId,
 	        job: job
 	      })
 	    );
@@ -28848,6 +28879,13 @@
 	  },
 	  changeJobId: function changeJobId(e) {
 	    this.setState({ jobId: parseInt(e.target.value) });
+	  },
+	  printInvoice: function printInvoice() {
+	    //This opens up a new window and prints just the invoice details
+	    var w = window.open();
+	    w.document.write('<pre>' + document.getElementById('invoiceDetails').innerHTML + '</pre>');
+	    w.print();
+	    w.close();
 	  }
 	});
 	
@@ -28857,7 +28895,6 @@
 	  render: function render() {
 	    var dateBeginning = this.props.dateBeginning;
 	    var dateEnd = this.props.dateEnd;
-	    var jobId = this.props.jobId;
 	    var job = this.props.job;
 	    var data = this.props.data;
 	    var timeEntries = data.timeEntries;
@@ -28872,76 +28909,40 @@
 	    if (job) {
 	      for (var t = 0; t < timeEntries.length; t++) {
 	        var timeEntry = timeEntries[t];
-	        if ((!dateBeginning || timeEntry.date >= dateBeginning) && (!dateEnd || timeEntry.date <= dateEnd) && (!jobId || timeEntry.jobId === jobId)) {
+	        if (timeEntry.date >= dateBeginning && timeEntry.date <= dateEnd && timeEntry.jobId === job.id) {
 	          shownEntries.push(timeEntry);
 	          subtotal += timeEntry.time / 60 * job.hourlyRate;
 	        }
 	      }
-	      tax = subtotal * job.taxRate;
+	      //Doing math.ceil to make the invoice always add up correctly
+	      subtotal = Math.ceil(subtotal * 100) / 100;
+	      tax = Math.ceil(subtotal * (job.taxRate / 100)) / 100;
 	      total = subtotal + tax;
 	    }
-	    var invoiceTimeRows = shownEntries.map(function (result) {
-	      return _react2.default.createElement(InvoiceTimeRow, {
-	        key: result.id,
-	        time: result.time,
-	        date: result.date,
-	        summary: result.summary
-	      });
-	    });
+	    var separator = '-------------------------------------------------';
+	    var asciiTable = new _asciiTable2.default('Entries');
+	    asciiTable.setTitleAlignCenter();
+	    asciiTable.setHeading('Time', 'Date', 'Summary');
+	    for (var i = 0; i < shownEntries.length; i++) {
+	      var entry = shownEntries[i];
+	      asciiTable.addRow(entry.time, _Validator.DateUtils.formatDate(entry.date), entry.summary.substring(0, separator.length - 24));
+	    }
+	    var startDateStr = _Validator.DateUtils.formatDate(dateBeginning);
+	    var endDateStr = _Validator.DateUtils.formatDate(dateEnd);
+	    var asciiTableStr;
+	    if (shownEntries.length === 0) {
+	      asciiTableStr = 'No Entries';
+	    } else {
+	      asciiTableStr = asciiTable.toString();
+	    }
+	    var subtotalStr = subtotal.toFixed(2);
+	    var taxStr = tax.toFixed(2);
+	    var totalStr = total.toFixed(2);
+	    var jobTitleStr = job ? job.title : '';
 	    return _react2.default.createElement(
-	      'div',
-	      { className: 'invoiceDetails' },
-	      'Entries',
-	      _react2.default.createElement(
-	        'table',
-	        null,
-	        _react2.default.createElement(
-	          'thead',
-	          null,
-	          _react2.default.createElement(
-	            'tr',
-	            null,
-	            _react2.default.createElement(
-	              'th',
-	              null,
-	              'Time'
-	            ),
-	            _react2.default.createElement(
-	              'th',
-	              null,
-	              'Date'
-	            ),
-	            _react2.default.createElement(
-	              'th',
-	              null,
-	              'Summary'
-	            )
-	          )
-	        ),
-	        _react2.default.createElement(
-	          'tbody',
-	          null,
-	          invoiceTimeRows
-	        )
-	      ),
-	      _react2.default.createElement(
-	        'div',
-	        null,
-	        'Subtotal: $',
-	        subtotal.toFixed(2)
-	      ),
-	      _react2.default.createElement(
-	        'div',
-	        null,
-	        'Tax: $',
-	        tax.toFixed(2)
-	      ),
-	      _react2.default.createElement(
-	        'div',
-	        null,
-	        'Total: $',
-	        total.toFixed(2)
-	      )
+	      'pre',
+	      { id: 'invoiceDetails', className: 'invoiceDetails' },
+	      'Invoice\n\nJob: ' + jobTitleStr + '\nDate Range: ' + startDateStr + ' - ' + endDateStr + '\n' + separator + '\n' + asciiTableStr + '\n' + separator + '\nSubtotal: $' + subtotalStr + '\nTax: $' + taxStr + '\nTotal: $' + totalStr
 	    );
 	  }
 	});
@@ -28974,6 +28975,673 @@
 	});
 	
 	exports.Invoice = Invoice;
+
+/***/ },
+/* 240 */
+/*!********************************!*\
+  !*** ./~/ascii-table/index.js ***!
+  \********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__(/*! ./ascii-table */ 241)
+
+/***/ },
+/* 241 */
+/*!**************************************!*\
+  !*** ./~/ascii-table/ascii-table.js ***!
+  \**************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * (c) 2013 Beau Sorensen
+	 * MIT Licensed
+	 * For all details and documentation:
+	 * https://github.com/sorensen/ascii-table
+	 */
+	
+	;(function() {
+	'use strict';
+	
+	/*!
+	 * Module dependencies
+	 */
+	
+	var slice = Array.prototype.slice
+	  , toString = Object.prototype.toString
+	
+	/**
+	 * AsciiTable constructor
+	 *
+	 * @param {String|Object} title or JSON table
+	 * @param {Object} table options
+	 *  - `prefix` - string prefix added to each line on render
+	 * @constructor
+	 * @api public
+	 */
+	
+	function AsciiTable(name, options) {
+	  this.options = options || {}
+	  this.reset(name)
+	}
+	
+	/*!
+	 * Current library version, should match `package.json`
+	 */
+	
+	AsciiTable.VERSION = '0.0.8'
+	
+	/*!
+	 * Alignment constants
+	 */
+	
+	AsciiTable.LEFT = 0
+	AsciiTable.CENTER = 1
+	AsciiTable.RIGHT = 2
+	
+	/*!
+	 * Static methods
+	 */
+	
+	/**
+	 * Create a new table instance
+	 *
+	 * @param {String|Object} title or JSON table
+	 * @param {Object} table options
+	 * @api public
+	 */
+	
+	AsciiTable.factory = function(name, options) {
+	  return new AsciiTable(name, options)
+	}
+	
+	/**
+	 * Align the a string at the given length
+	 *
+	 * @param {Number} direction
+	 * @param {String} string input
+	 * @param {Number} string length
+	 * @param {Number} padding character
+	 * @api public
+	 */
+	
+	AsciiTable.align = function(dir, str, len, pad) {
+	  if (dir === AsciiTable.LEFT) return AsciiTable.alignLeft(str, len, pad)
+	  if (dir === AsciiTable.RIGHT) return AsciiTable.alignRight(str, len, pad)
+	  if (dir === AsciiTable.CENTER) return AsciiTable.alignCenter(str, len, pad)
+	  return AsciiTable.alignAuto(str, len, pad)
+	}
+	
+	/**
+	 * Left align a string by padding it at a given length
+	 *
+	 * @param {String} str
+	 * @param {Number} string length
+	 * @param {String} padding character (optional, default '')
+	 * @api public
+	 */
+	
+	AsciiTable.alignLeft = function(str, len, pad) {
+	  if (!len || len < 0) return ''
+	  if (str === undefined || str === null) str = ''
+	  if (typeof pad === 'undefined') pad = ' '
+	  if (typeof str !== 'string') str = str.toString()
+	  var alen = len + 1 - str.length
+	  if (alen <= 0) return str
+	  return str + Array(len + 1 - str.length).join(pad)
+	}
+	
+	/**
+	 * Center align a string by padding it at a given length
+	 *
+	 * @param {String} str
+	 * @param {Number} string length
+	 * @param {String} padding character (optional, default '')
+	 * @api public
+	 */
+	
+	AsciiTable.alignCenter = function(str, len, pad) {
+	  if (!len || len < 0) return ''
+	  if (str === undefined || str === null) str = ''
+	  if (typeof pad === 'undefined') pad = ' '
+	  if (typeof str !== 'string') str = str.toString()
+	  var nLen = str.length
+	    , half = Math.floor(len / 2 - nLen / 2)
+	    , odds = Math.abs((nLen % 2) - (len % 2))
+	    , len = str.length
+	
+	  return AsciiTable.alignRight('', half, pad) 
+	    + str
+	    + AsciiTable.alignLeft('', half + odds, pad)
+	}
+	
+	/**
+	 * Right align a string by padding it at a given length
+	 *
+	 * @param {String} str
+	 * @param {Number} string length
+	 * @param {String} padding character (optional, default '')
+	 * @api public
+	 */
+	
+	AsciiTable.alignRight = function(str, len, pad) {
+	  if (!len || len < 0) return ''
+	  if (str === undefined || str === null) str = ''
+	  if (typeof pad === 'undefined') pad = ' '
+	  if (typeof str !== 'string') str = str.toString()
+	  var alen = len + 1 - str.length
+	  if (alen <= 0) return str
+	  return Array(len + 1 - str.length).join(pad) + str
+	}
+	
+	/**
+	 * Auto align string value based on object type
+	 *
+	 * @param {Any} object to string
+	 * @param {Number} string length
+	 * @param {String} padding character (optional, default '')
+	 * @api public
+	 */
+	
+	AsciiTable.alignAuto = function(str, len, pad) {
+	  if (str === undefined || str === null) str = ''
+	  var type = toString.call(str)
+	  pad || (pad = ' ')
+	  len = +len
+	  if (type !== '[object String]') {
+	    str = str.toString()
+	  }
+	  if (str.length < len) {
+	    switch(type) {
+	      case '[object Number]': return AsciiTable.alignRight(str, len, pad)
+	      default: return AsciiTable.alignLeft(str, len, pad)
+	    }
+	  }
+	  return str
+	}
+	
+	/**
+	 * Fill an array at a given size with the given value
+	 *
+	 * @param {Number} array size
+	 * @param {Any} fill value
+	 * @return {Array} filled array
+	 * @api public
+	 */
+	
+	AsciiTable.arrayFill = function(len, fill) {
+	  var arr = new Array(len)
+	  for (var i = 0; i !== len; i++) {
+	    arr[i] = fill;
+	  }
+	  return arr
+	}
+	
+	/*!
+	 * Instance methods
+	 */
+	
+	/**
+	 * Reset the table state back to defaults
+	 *
+	 * @param {String|Object} title or JSON table
+	 * @api public
+	 */
+	
+	AsciiTable.prototype.reset = 
+	AsciiTable.prototype.clear = function(name) {
+	  this.__name = ''
+	  this.__nameAlign = AsciiTable.CENTER
+	  this.__rows = []
+	  this.__maxCells = 0
+	  this.__aligns = []
+	  this.__colMaxes = []
+	  this.__spacing = 1
+	  this.__heading = null
+	  this.__headingAlign = AsciiTable.CENTER
+	  this.setBorder()
+	
+	  if (toString.call(name) === '[object String]') {
+	    this.__name = name
+	  } else if (toString.call(name) === '[object Object]') {
+	    this.fromJSON(name)
+	  }
+	  return this
+	}
+	
+	/**
+	 * Set the table border
+	 *
+	 * @param {String} horizontal edges (optional, default `|`)
+	 * @param {String} vertical edges (optional, default `-`)
+	 * @param {String} top corners (optional, default `.`)
+	 * @param {String} bottom corners (optional, default `'`)
+	 * @api public
+	 */
+	
+	AsciiTable.prototype.setBorder = function(edge, fill, top, bottom) {
+	  this.__border = true
+	  if (arguments.length === 1) {
+	    fill = top = bottom = edge
+	  }
+	  this.__edge = edge || '|'
+	  this.__fill = fill || '-'
+	  this.__top = top || '.'
+	  this.__bottom = bottom || "'"
+	  return this
+	}
+	
+	/**
+	 * Remove all table borders
+	 *
+	 * @api public
+	 */
+	
+	AsciiTable.prototype.removeBorder = function() {
+	  this.__border = false
+	  this.__edge = ' '
+	  this.__fill = ' '
+	  return this
+	}
+	
+	/**
+	 * Set the column alignment at a given index
+	 *
+	 * @param {Number} column index
+	 * @param {Number} alignment direction
+	 * @api public
+	 */
+	
+	AsciiTable.prototype.setAlign = function(idx, dir) {
+	  this.__aligns[idx] = dir
+	  return this
+	}
+	
+	/**
+	 * Set the title of the table
+	 *
+	 * @param {String} title
+	 * @api public
+	 */
+	
+	AsciiTable.prototype.setTitle = function(name) {
+	  this.__name = name
+	  return this
+	}
+	
+	/**
+	 * Get the title of the table
+	 *
+	 * @return {String} title
+	 * @api public
+	 */
+	
+	AsciiTable.prototype.getTitle = function() {
+	  return this.__name
+	}
+	
+	/**
+	 * Set table title alignment
+	 *
+	 * @param {Number} direction
+	 * @api public
+	 */
+	
+	AsciiTable.prototype.setTitleAlign = function(dir) {
+	  this.__nameAlign = dir
+	  return this
+	}
+	
+	/**
+	 * AsciiTable sorting shortcut to sort rows
+	 *
+	 * @param {Function} sorting method
+	 * @api public
+	 */
+	
+	AsciiTable.prototype.sort = function(method) {
+	  this.__rows.sort(method)
+	  return this
+	}
+	
+	/**
+	 * Sort rows based on sort method for given column
+	 *
+	 * @param {Number} column index
+	 * @param {Function} sorting method
+	 * @api public
+	 */
+	
+	AsciiTable.prototype.sortColumn = function(idx, method) {
+	  this.__rows.sort(function(a, b) {
+	    return method(a[idx], b[idx])
+	  })
+	  return this
+	}
+	
+	/**
+	 * Set table heading for columns
+	 *
+	 * @api public
+	 */
+	
+	AsciiTable.prototype.setHeading = function(row) {
+	  if (arguments.length > 1 || toString.call(row) !== '[object Array]') {
+	    row = slice.call(arguments)
+	  }
+	  this.__heading = row
+	  return this
+	}
+	
+	/**
+	 * Get table heading for columns
+	 *
+	 * @return {Array} copy of headings
+	 * @api public
+	 */
+	
+	AsciiTable.prototype.getHeading = function() {
+	  return this.__heading.slice()
+	}
+	
+	/**
+	 * Set heading alignment
+	 *
+	 * @param {Number} direction
+	 * @api public
+	 */
+	
+	AsciiTable.prototype.setHeadingAlign = function(dir) {
+	  this.__headingAlign = dir
+	  return this
+	}
+	
+	/**
+	 * Add a row of information to the table
+	 * 
+	 * @param {...|Array} argument values in order of columns
+	 * @api public
+	 */
+	
+	AsciiTable.prototype.addRow = function(row) {
+	  if (arguments.length > 1 || toString.call(row) !== '[object Array]') {
+	    row = slice.call(arguments)
+	  }
+	  this.__maxCells = Math.max(this.__maxCells, row.length)
+	  this.__rows.push(row)
+	  return this
+	}
+	
+	/**
+	 * Get a copy of all rows of the table
+	 *
+	 * @return {Array} copy of rows
+	 * @api public
+	 */
+	
+	AsciiTable.prototype.getRows = function() {
+	  return this.__rows.slice().map(function(row) {
+	    return row.slice()
+	  })
+	}
+	
+	/**
+	 * Add rows in the format of a row matrix
+	 *
+	 * @param {Array} row matrix
+	 * @api public
+	 */
+	
+	AsciiTable.prototype.addRowMatrix = function(rows) {
+	  for (var i = 0; i < rows.length; i++) {
+	    this.addRow(rows[i])
+	  }
+	  return this
+	}
+	
+	/**
+	 * Add rows from the given data array, processed by the callback function rowCallback.
+	 *
+	 * @param {Array} data
+	 * @param (Function) rowCallback
+	 * @param (Boolean) asMatrix - controls if the row created by rowCallback should be assigned as row matrix
+	 * @api public
+	 */
+	
+	AsciiTable.prototype.addData = function(data, rowCallback, asMatrix) {
+	  if (toString.call(data) !== '[object Array]') {
+	    return this;
+	  }
+	  for (var index = 0, limit = data.length; index < limit; index++) {
+	    var row = rowCallback(data[index]);
+	    if(asMatrix) {
+	      this.addRowMatrix(row);
+	    } else {
+	      this.addRow(row);
+	    }
+	  }
+	  return this
+	}
+	
+	  /**
+	 * Reset the current row state
+	 *
+	 * @api public
+	 */
+	
+	AsciiTable.prototype.clearRows = function() {
+	  this.__rows = []
+	  this.__maxCells = 0
+	  this.__colMaxes = []
+	  return this
+	}
+	
+	/**
+	 * Apply an even spaced column justification
+	 *
+	 * @param {Boolean} on / off
+	 * @api public
+	 */
+	
+	AsciiTable.prototype.setJustify = function(val) {
+	  arguments.length === 0 && (val = true)
+	  this.__justify = !!val
+	  return this
+	}
+	
+	/**
+	 * Convert the current instance to a JSON structure
+	 *
+	 * @return {Object} json representation
+	 * @api public
+	 */
+	
+	AsciiTable.prototype.toJSON = function() {
+	  return {
+	    title: this.getTitle()
+	  , heading: this.getHeading()
+	  , rows: this.getRows()
+	  }
+	}
+	
+	/**
+	 * Populate the table from a JSON object
+	 *
+	 * @param {Object} json representation
+	 * @api public
+	 */
+	
+	AsciiTable.prototype.parse = 
+	AsciiTable.prototype.fromJSON = function(obj) {
+	  return this
+	    .clear()
+	    .setTitle(obj.title)
+	    .setHeading(obj.heading)
+	    .addRowMatrix(obj.rows)
+	}
+	
+	/**
+	 * Render the table with the current information
+	 *
+	 * @return {String} formatted table
+	 * @api public
+	 */
+	
+	AsciiTable.prototype.render =
+	AsciiTable.prototype.valueOf =
+	AsciiTable.prototype.toString = function() {
+	  var self = this
+	    , body = []
+	    , mLen = this.__maxCells
+	    , max = AsciiTable.arrayFill(mLen, 0)
+	    , total = mLen * 3
+	    , rows = this.__rows
+	    , justify
+	    , border = this.__border
+	    , all = this.__heading 
+	        ? [this.__heading].concat(rows)
+	        : rows
+	
+	  // Calculate max table cell lengths across all rows
+	  for (var i = 0; i < all.length; i++) {
+	    var row = all[i]
+	    for (var k = 0; k < mLen; k++) {
+	      var cell = row[k]
+	      max[k] = Math.max(max[k], cell ? cell.toString().length : 0)
+	    }
+	  }
+	  this.__colMaxes = max
+	  justify = this.__justify ? Math.max.apply(null, max) : 0
+	
+	  // Get 
+	  max.forEach(function(x) {
+	    total += justify ? justify : x + self.__spacing
+	  })
+	  justify && (total += max.length)
+	  total -= this.__spacing
+	
+	  // Heading
+	  border && body.push(this._seperator(total - mLen + 1, this.__top))
+	  if (this.__name) {
+	    body.push(this._renderTitle(total - mLen + 1))
+	    border && body.push(this._seperator(total - mLen + 1))
+	  }
+	  if (this.__heading) {
+	    body.push(this._renderRow(this.__heading, ' ', this.__headingAlign))
+	    body.push(this._rowSeperator(mLen, this.__fill))
+	  }
+	  for (var i = 0; i < this.__rows.length; i++) {
+	    body.push(this._renderRow(this.__rows[i], ' '))
+	  }
+	  border && body.push(this._seperator(total - mLen + 1, this.__bottom))
+	
+	  var prefix = this.options.prefix || ''
+	  return prefix + body.join('\n' + prefix)
+	}
+	
+	/**
+	 * Create a line seperator
+	 *
+	 * @param {Number} string size
+	 * @param {String} side values (default '|')
+	 * @api private
+	 */
+	
+	AsciiTable.prototype._seperator = function(len, sep) {
+	  sep || (sep = this.__edge)
+	  return sep + AsciiTable.alignRight(sep, len, this.__fill)
+	}
+	
+	/**
+	 * Create a row seperator
+	 *
+	 * @return {String} seperator
+	 * @api private
+	 */
+	
+	AsciiTable.prototype._rowSeperator = function() {
+	  var blanks = AsciiTable.arrayFill(this.__maxCells, this.__fill)
+	  return this._renderRow(blanks, this.__fill)
+	}
+	
+	/**
+	 * Render the table title in a centered box
+	 *
+	 * @param {Number} string size
+	 * @return {String} formatted title
+	 * @api private
+	 */
+	
+	AsciiTable.prototype._renderTitle = function(len) {
+	  var name = ' ' + this.__name + ' '
+	    , str = AsciiTable.align(this.__nameAlign, name, len - 1, ' ')
+	  return this.__edge + str + this.__edge
+	}
+	
+	/**
+	 * Render an invdividual row
+	 *
+	 * @param {Array} row
+	 * @param {String} column seperator
+	 * @param {Number} total row alignment (optional, default `auto`)
+	 * @return {String} formatted row
+	 * @api private
+	 */
+	
+	AsciiTable.prototype._renderRow = function(row, str, align) {
+	  var tmp = ['']
+	    , max = this.__colMaxes
+	
+	  for (var k = 0; k < this.__maxCells; k++) {
+	    var cell = row[k]
+	      , just = this.__justify ? Math.max.apply(null, max) : max[k]
+	      // , pad = k === this.__maxCells - 1 ? just : just + this.__spacing
+	      , pad = just
+	      , cAlign = this.__aligns[k]
+	      , use = align
+	      , method = 'alignAuto'
+	  
+	    if (typeof align === 'undefined') use = cAlign
+	
+	    if (use === AsciiTable.LEFT) method = 'alignLeft'
+	    if (use === AsciiTable.CENTER) method = 'alignCenter'
+	    if (use === AsciiTable.RIGHT) method = 'alignRight'
+	
+	    tmp.push(AsciiTable[method](cell, pad, str))
+	  }
+	  var front = tmp.join(str + this.__edge + str)
+	  front = front.substr(1, front.length)
+	  return front + str + this.__edge
+	}
+	
+	/*!
+	 * Aliases
+	 */
+	
+	// Create method shortcuts to all alignment methods for each direction
+	;['Left', 'Right', 'Center'].forEach(function(dir) {
+	  var constant = AsciiTable[dir.toUpperCase()]
+	
+	  ;['setAlign', 'setTitleAlign', 'setHeadingAlign'].forEach(function(method) {
+	    // Call the base method with the direction constant as the last argument
+	    AsciiTable.prototype[method + dir] = function() {
+	      var args = slice.call(arguments).concat(constant)
+	      return this[method].apply(this, args)
+	    }
+	  })
+	})
+	
+	/*!
+	 * Module exports.
+	 */
+	
+	if (true) {
+	  module.exports = AsciiTable
+	} else {
+	  this.AsciiTable = AsciiTable
+	}
+	
+	}).call(this);
+
 
 /***/ }
 /******/ ]);

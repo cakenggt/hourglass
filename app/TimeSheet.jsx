@@ -9,10 +9,7 @@ var TimeSheet = React.createClass({
     };
   },
   render: function() {
-    var jobIds = [];
-    for (var j = 0; j < this.props.data.jobs.length; j++){
-      jobIds.push(this.props.data.jobs[j].id);
-    }
+    var jobs = this.props.data.jobs;
     var newTimeEntry = {
       id: 'NEW',
       time: 1,
@@ -26,43 +23,48 @@ var TimeSheet = React.createClass({
         data={newTimeEntry}
         editable={true}
         changeData={this.changeNewData}
-        jobIds={jobIds}
-        cancel={this.cancel}/> :
+        jobs={jobs}
+        cancel={this.cancel}
+        className='altTableRow'/> :
       null;
-    var entries = this.props.data.timeEntries.map(result => {
+    var entries = this.props.data.timeEntries.map((result, i) => {
+      var className = i%2 == 0 ? 'tableRow' : 'altTableRow';
       return (
         <TimeEntry
           key={result.id}
           data={result}
           editable={false}
-          jobIds={jobIds}
+          jobs={jobs}
           changeData={this.props.changeData}
-          cancel={this.cancel}/>
+          cancel={this.cancel}
+          className={className}/>
       );
     });
     var addTimeOrAddJob = this.props.data.jobs.length === 0 ? (
-      <Link to="/jobs" activeClassName="active">
+      <Link to="/jobs">
         You must add a job to add a time entry. Go to Jobs
       </Link>
     ) :
     (
-      <div onClick={this.addJob}>
+      <div
+        className="add-button"
+        onClick={this.addTimeEntry}>
         Add Time Entry
       </div>
     );
     return (
-      <div>
+      <div
+        className="tableContainer">
         {addTimeOrAddJob}
         <table>
           <thead>
             <tr>
-              <th>Id</th>
-              <th>Time</th>
-              <th>Date</th>
-              <th>Summary</th>
-              <th>Job Id</th>
-              <th>Edit</th>
-              <th>Delete</th>
+              <th style={{width: '20%'}}>Time</th>
+              <th style={{width: '20%'}}>Date</th>
+              <th style={{width: '30%'}}>Summary</th>
+              <th style={{width: '20%'}}>Job</th>
+              <th style={{width: '5%'}}></th>{/*Edit*/}
+              <th style={{width: '5%'}}></th>{/*Delete*/}
             </tr>
           </thead>
           <tbody>
@@ -73,7 +75,7 @@ var TimeSheet = React.createClass({
       </div>
     );
   },
-  addJob: function() {
+  addTimeEntry: function() {
     this.setState({newEntry: true});
   },
   changeNewData: function(object){
@@ -96,18 +98,19 @@ var TimeEntry = React.createClass({
     var dateString = DateUtils.formatDate(this.state.data.date);
     if (this.state.editable){
       var id = this.state.data.id;
-      var jobIds = this.props.jobIds.map(result => {
+      var jobs = this.props.jobs.map(result => {
         return (
           <option
-            key={result}
-            value={result}>
-            {result}
+            key={result.id}
+            value={result.id}>
+            {result.title}
           </option>
         );
       });
       return (
-        <tr>
-          <td>{id}</td>
+        <tr
+          className={this.props.className}
+        >
           <td><input
                 type="number"
                 defaultValue={this.state.data.time}
@@ -126,29 +129,58 @@ var TimeEntry = React.createClass({
           <td><select
                 id={'jobId-'+id}
                 defaultValue={this.state.data.jobId}
-              >{jobIds}</select></td>
+              >{jobs}</select></td>
           <td>
-            <span onClick={this.onSave}>Save</span>
+            <i
+              className="material-icons"
+              onClick={this.onSave}
+              title="Save">
+              done
+            </i>
           </td>
           <td>
-            <span onClick={this.onCancel}>Cancel</span>
+            <i
+              className="material-icons"
+              onClick={this.onCancel}
+              title="Cancel">
+              clear
+            </i>
           </td>
         </tr>
       )
     }
     else{
+      var job;
+      for (var i = 0; i < this.props.jobs.length; i++){
+        var j = this.props.jobs[i];
+        if (j.id === this.state.data.jobId){
+          job = j;
+          break;
+        }
+      }
       return (
-        <tr>
-          <td>{this.state.data.id}</td>
+        <tr
+          className={this.props.className}
+        >
           <td>{this.state.data.time}</td>
           <td>{dateString}</td>
           <td>{this.state.data.summary}</td>
-          <td>{this.state.data.jobId}</td>
+          <td>{job.title}</td>
           <td>
-            <span onClick={this.onEdit}>Edit</span>
+            <i
+              className="material-icons"
+              onClick={this.onEdit}
+              title="Edit">
+              mode_edit
+            </i>
           </td>
           <td>
-            <span onClick={this.onDelete}>Delete</span>
+            <i
+              className="material-icons"
+              onClick={this.onDelete}
+              title="Delete">
+              delete
+            </i>
           </td>
         </tr>
       )
