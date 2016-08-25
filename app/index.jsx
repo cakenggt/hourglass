@@ -1,3 +1,4 @@
+import 'babel-polyfill';
 import React from 'react';
 import {Router, Route, IndexRoute, IndexLink, Link, hashHistory} from 'react-router';
 import {render} from 'react-dom';

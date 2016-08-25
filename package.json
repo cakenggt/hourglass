@@ -25,6 +25,7 @@
   "dependencies": {
     "ascii-table": "0.0.9",
     "babel-loader": "^6.2.5",
+    "babel-polyfill": "^6.13.0",
     "babel-preset-es2015": "^6.13.2",
     "babel-preset-react": "^6.11.1",
     "body-parser": "^1.15.2",

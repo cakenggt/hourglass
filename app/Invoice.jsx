@@ -88,11 +88,10 @@ var Invoice = React.createClass({
     this.setState({jobId: parseInt(e.target.value)});
   },
   printInvoice: function(){
-    //This opens up a new window and prints just the invoice details
+    //This opens up a new window and tries to print
     var w=window.open();
     w.document.write('<pre>'+document.getElementById('invoiceDetails').innerHTML+'</pre>');
     w.print();
-    w.close();
   }
 });
 
