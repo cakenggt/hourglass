@@ -59,7 +59,7 @@ var TimeSheet = React.createClass({
         <table>
           <thead>
             <tr>
-              <th style={{width: '20%'}}>Time</th>
+              <th style={{width: '20%'}}>Minutes</th>
               <th style={{width: '20%'}}>Date</th>
               <th style={{width: '30%'}}>Summary</th>
               <th style={{width: '20%'}}>Job</th>
