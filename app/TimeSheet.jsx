@@ -5,7 +5,9 @@ import {DateUtils} from './Validator';
 var TimeSheet = React.createClass({
   getInitialState: function() {
     return {
-      newEntry: false
+      newEntry: false,
+      lastSort: 'id',
+      sortOrder: 1
     };
   },
   render: function() {
@@ -59,10 +61,18 @@ var TimeSheet = React.createClass({
         <table>
           <thead>
             <tr>
-              <th style={{width: '20%'}}>Minutes</th>
-              <th style={{width: '20%'}}>Date</th>
-              <th style={{width: '30%'}}>Summary</th>
-              <th style={{width: '20%'}}>Job</th>
+              <th
+                style={{width: '20%'}}
+                onClick={this.sortGenerator('date')}>Date</th>
+              <th
+                style={{width: '30%'}}
+                onClick={this.sortGenerator('summary')}>Summary</th>
+              <th
+                style={{width: '20%'}}
+                onClick={this.sortGenerator('time')}>Minutes</th>
+              <th
+                style={{width: '20%'}}
+                onClick={this.sortGenerator('jobId')}>Job</th>
               <th style={{width: '5%'}}></th>{/*Edit*/}
               <th style={{width: '5%'}}></th>{/*Delete*/}
             </tr>
@@ -84,6 +94,19 @@ var TimeSheet = React.createClass({
   },
   cancel: function(){
     this.setState({newEntry: false});
+  },
+  sortGenerator: function(column){
+    return ()=>{
+      var sortOrder = this.state.sortOrder;
+      if (this.state.lastSort === column){
+        sortOrder *= -1;
+        this.setState({sortOrder: sortOrder});
+      }
+      else{
+        this.setState({lastSort: column});
+      }
+      this.props.sort('timeEntries', column, sortOrder);
+    }
   }
 });
 
@@ -112,11 +135,6 @@ var TimeEntry = React.createClass({
           className={this.props.className}
         >
           <td><input
-                type="number"
-                defaultValue={this.state.data.time}
-                id={'time-'+id}
-              /></td>
-          <td><input
                 type="date"
                 defaultValue={dateString}
                 id={'date-'+id}
@@ -125,6 +143,11 @@ var TimeEntry = React.createClass({
                 type="text"
                 defaultValue={this.state.data.summary}
                 id={'summary-'+id}
+              /></td>
+          <td><input
+                type="number"
+                defaultValue={this.state.data.time}
+                id={'time-'+id}
               /></td>
           <td><select
                 id={'jobId-'+id}
@@ -162,9 +185,9 @@ var TimeEntry = React.createClass({
         <tr
           className={this.props.className}
         >
-          <td>{this.state.data.time}</td>
           <td>{dateString}</td>
           <td>{this.state.data.summary}</td>
+          <td>{this.state.data.time}</td>
           <td>{job.title}</td>
           <td>
             <i

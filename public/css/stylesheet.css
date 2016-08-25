@@ -69,6 +69,10 @@ table {
 th {
   background-color: black;
   color: yellow;
+  cursor: pointer;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
 }
 .tableContainer {
   text-align: center;

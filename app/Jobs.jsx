@@ -3,7 +3,9 @@ import React from 'react';
 var Jobs = React.createClass({
   getInitialState: function() {
     return {
-      newEntry: false
+      newEntry: false,
+      lastSort: 'id',
+      sortOrder: 1
     };
   },
   render: function() {
@@ -52,9 +54,15 @@ var Jobs = React.createClass({
         <table>
           <thead>
             <tr>
-              <th style={{width: '30%'}}>Title</th>
-              <th style={{width: '30%'}}>Hourly Rate</th>
-              <th style={{width: '30%'}}>Tax Rate</th>
+              <th
+                style={{width: '30%'}}
+                onClick={this.sortGenerator('title')}>Title</th>
+              <th
+                style={{width: '30%'}}
+                onClick={this.sortGenerator('hourlyRate')}>Hourly Rate</th>
+              <th
+                style={{width: '30%'}}
+                onClick={this.sortGenerator('taxRate')}>Tax Rate</th>
               <th style={{width: '5%'}}></th>{/*Edit*/}
               <th style={{width: '5%'}}></th>{/*Delete*/}
             </tr>
@@ -76,6 +84,19 @@ var Jobs = React.createClass({
   },
   cancel: function(){
     this.setState({newEntry: false});
+  },
+  sortGenerator: function(column){
+    return ()=>{
+      var sortOrder = this.state.sortOrder;
+      if (this.state.lastSort === column){
+        sortOrder *= -1;
+        this.setState({sortOrder: sortOrder});
+      }
+      else{
+        this.setState({lastSort: column});
+      }
+      this.props.sort('jobs', column, sortOrder);
+    }
   }
 });
 

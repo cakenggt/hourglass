@@ -38,7 +38,8 @@ var App = React.createClass({
           {React.Children.map(this.props.children, child => {
             return React.cloneElement(child, {
               data: this.state,
-              changeData: this.changeData
+              changeData: this.changeData,
+              sort: this.sort
             });
           })}
         </div>
@@ -107,6 +108,27 @@ var App = React.createClass({
       this.setState(state);
       Network.create(this, state, key, Object.assign({}, data), type);
     }
+  },
+  sort: function(key, column, order){
+    var lst = this.state[key];
+    lst.sort(function(a, b){
+      var itemA = a[column];
+      var itemB = b[column];
+      var result = 0;
+      if (typeof itemA === 'string'){
+        result = order*itemA.localeCompare(itemB);
+      }
+      else{
+        result = order*(itemA-itemB);
+      }
+      if (result === 0){
+        result = a.id-b.id;
+      }
+      return result;
+    });
+    var state = {};
+    state[key] = lst;
+    this.setState(state);
   }
 });
 

@@ -131,7 +131,7 @@ var InvoiceDetails = React.createClass({
     var separator = '-------------------------------------------------';
     var asciiTable = new AsciiTable('Entries');
     asciiTable.setTitleAlignCenter();
-    asciiTable.setHeading('Time', 'Date', 'Summary');
+    asciiTable.setHeading('Minutes', 'Date', 'Summary');
     for (var i = 0; i < shownEntries.length; i++){
       var entry = shownEntries[i];
       asciiTable.addRow(
