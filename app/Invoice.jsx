@@ -140,8 +140,12 @@ var InvoiceDetails = React.createClass({
         entry.summary.substring(0, separator.length-24)
       );
     }
-    var startDateStr = DateUtils.formatDate(dateBeginning);
-    var endDateStr = DateUtils.formatDate(dateEnd);
+    var startDateStr = dateBeginning ?
+      DateUtils.formatDate(dateBeginning) :
+      'NONE';
+    var endDateStr = dateEnd ?
+      DateUtils.formatDate(dateEnd) :
+      'NONE';
     var asciiTableStr;
     if (shownEntries.length === 0){
       asciiTableStr = 'No Entries'
