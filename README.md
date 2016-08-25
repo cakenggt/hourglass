@@ -8,10 +8,15 @@ Some features:
 
 ## Setup
 
-Run the npm install script to install all dependencies
+Run the npm install script to install all dependencies.
+
 `npm install`
 
 There must be a PostgreSQL db available for the backend. The url with the login credentials pointing to this db will be made available in the credentials file.
+
+The url for the db should be in the following format:
+
+`postgres:username:password@localhost:5432/hourglass`
 
 There must be a file in the root directly called `credentials.js`. This file should export the following properties:
 * `DATABASE_URL` The url of the PostgreSQL database. This should include the username and password to access the db.
@@ -19,5 +24,7 @@ There must be a file in the root directly called `credentials.js`. This file sho
 * `PORT` What port the server will run on.
 
 Run the start command to build the scripts and deploy the app.
+
 `npm start`
+
 You can then access the app by going to `localhost:PORT` where `PORT` is the one you specified in the credentials file.
