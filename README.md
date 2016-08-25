@@ -4,6 +4,7 @@ Hourglass is a TimeSheet application that can be used to register jobs and track
 
 Some features:
 * Columns on the TimeSheet and Jobs pages are sortable and reverse-sortable by clicking on the yellow headers.
+* Fax-tastic invoice design!
 * The invoice can be printed off without the surrounding page by clicking the printer icon on the Invoice page.
 
 ## Setup
